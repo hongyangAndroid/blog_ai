@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 - 前架构时代</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        
+        .phase-badge {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 30px;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            gap: 60px;
+        }
+        
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .code-chaos {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #ff6666;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-chaos::before {
+            content: '⚠️';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+        
+        .code-line {
+            opacity: 0.8;
+        }
+        
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .pain-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: rgba(255, 68, 68, 0.08);
+            border-left: 4px solid #ff4444;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .pain-icon {
+            font-size: 32px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .pain-content h3 {
+            color: #ff6666;
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .pain-content p {
+            color: #cccccc;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .insight-box {
+            margin-top: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .insight-box .icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .insight-box p {
+            color: #00d4ff;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 68, 68, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <div class="header">
+            <div class="phase-badge">PHASE 1</div>
+            <h1 class="title">前架构时代 (2010-2013)</h1>
+        </div>
+        
+        <div class="content">
+            <div class="left-section">
+                <div class="code-chaos">
+                    <div class="code-line">class MainActivity : Activity() {</div>
+                    <div class="code-line">  override fun onCreate() {</div>
+                    <div class="code-line">    // 网络请求</div>
+                    <div class="code-line">    AsyncTask.execute { ... }</div>
+                    <div class="code-line">    // 数据处理</div>
+                    <div class="code-line">    val data = parseJson(...)</div>
+                    <div class="code-line">    // UI更新</div>
+                    <div class="code-line">    textView.text = data</div>
+                    <div class="code-line">    // 业务逻辑</div>
+                    <div class="code-line">    if (user.isVip) { ... }</div>
+                    <div class="code-line">  }</div>
+                    <div class="code-line">}</div>
+                </div>
+            </div>
+            
+            <div class="right-section">
+                <div class="pain-point">
+                    <div class="pain-icon">❌</div>
+                    <div class="pain-content">
+                        <h3>代码臃肿耦合</h3>
+                        <p>所有逻辑塞进 Activity/Fragment，网络请求、数据处理、UI更新、业务判断全部混在一起</p>
+                    </div>
+                </div>
+                
+                <div class="pain-point">
+                    <div class="pain-icon">❌</div>
+                    <div class="pain-content">
+                        <h3>Activity 成"万能类"</h3>
+                        <p>动辄上千行代码，生命周期 Bug 频发，改一行代码要翻半小时</p>
+                    </div>
+                </div>
+                
+                <div class="pain-point">
+                    <div class="pain-icon">❌</div>
+                    <div class="pain-content">
+                        <h3>无法单元测试</h3>
+                        <p>只能靠手动点击验证功能，几乎无法做自动化测试</p>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <div class="icon">💡</div>
+                    <p>不做关注点分离，早晚会被复杂度淹没</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

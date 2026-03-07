@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术选型指南</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f7f6f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .xhs-card {
+            width: 900px;
+            height: 1200px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .title {
+            font-size: 52px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #9b9b9b;
+        }
+        
+        .quadrant-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 25px;
+            flex: 1;
+        }
+        
+        .quadrant {
+            border-radius: 20px;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quadrant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        
+        .q1 {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #90caf9;
+        }
+        .q1::before { background: #2196f3; }
+        
+        .q2 {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #a5d6a7;
+        }
+        .q2::before { background: #4caf50; }
+        
+        .q3 {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #ffcc80;
+        }
+        .q3::before { background: #ff9800; }
+        
+        .q4 {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+            border: 2px solid #f48fb1;
+        }
+        .q4::before { background: #e91e63; }
+        
+        .q-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .q-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-bottom: 12px;
+        }
+        
+        .q-recommend {
+            font-size: 22px;
+            font-weight: 600;
+            color: #e16259;
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .q-reason {
+            font-size: 18px;
+            color: #6b6b6b;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .footer-text {
+            font-size: 22px;
+            color: #6b6b6b;
+        }
+        
+        .footer-highlight {
+            color: #e16259;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="xhs-card">
+        <div class="grid-bg"></div>
+        
+        <div class="content">
+            <div class="header">
+                <h1 class="title">不同场景该选什么架构？</h1>
+                <p class="subtitle">根据项目规模选择合适的技术栈</p>
+            </div>
+            
+            <div class="quadrant-container">
+                <div class="quadrant q1">
+                    <div class="q-icon">🎯</div>
+                    <div class="q-title">小型 Demo / 原型</div>
+                    <div class="q-recommend">无架构 或 MVP</div>
+                    <div class="q-reason">快速开发，验证想法，不需要过度设计</div>
+                </div>
+                
+                <div class="quadrant q2">
+                    <div class="q-icon">📱</div>
+                    <div class="q-title">中小型 App</div>
+                    <div class="q-recommend">MVVM + AAC</div>
+                    <div class="q-reason">生命周期感知，社区成熟，文档丰富</div>
+                </div>
+                
+                <div class="quadrant q3">
+                    <div class="q-icon">🏢</div>
+                    <div class="q-title">中大型 App</div>
+                    <div class="q-recommend">Clean + Coroutines</div>
+                    <div class="q-reason">业务解耦，可维护性强，适合团队协作</div>
+                </div>
+                
+                <div class="quadrant q4">
+                    <div class="q-icon">🚀</div>
+                    <div class="q-title">大型复杂 App</div>
+                    <div class="q-recommend">MVI + Compose</div>
+                    <div class="q-reason">状态可预测，声明式UI，测试友好</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p class="footer-text">
+                    💡 提示：<span class="footer-highlight">没有最好的架构，只有最适合的架构</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

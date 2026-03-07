@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coroutines + Flow 时代</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .phase-badge {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 30px;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            gap: 50px;
+        }
+        
+        .kotlin-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .kotlin-logo {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #a855f7, #ff6b6b, #f59e0b);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kotlin-logo::before {
+            content: 'K';
+            position: relative;
+            z-index: 2;
+        }
+        
+        .kotlin-logo::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .code-example {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e9d5ff;
+            line-height: 1.8;
+            width: 100%;
+        }
+        
+        .code-keyword { color: #c084fc; }
+        .code-func { color: #60a5fa; }
+        .code-string { color: #86efac; }
+        
+        .features-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 22px 25px;
+            margin-bottom: 18px;
+            background: rgba(168, 85, 247, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+        }
+        
+        .feature-text h4 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            color: #c4b5fd;
+            font-size: 14px;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <div class="header">
+            <div class="phase-badge">PHASE 6</div>
+            <h1 class="title">Coroutines + Flow (2019-2022)</h1>
+        </div>
+        
+        <div class="content">
+            <div class="kotlin-section">
+                <div class="kotlin-logo"></div>
+                <div class="code-example">
+                    <div><span class="code-keyword">viewModelScope</span>.<span class="code-func">launch</span> {</div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">val</span> user = repo.<span class="code-func">getUser</span>(id)</div>
+                    <div>&nbsp;&nbsp;<span class="code-keyword">val</span> orders = repo.<span class="code-func">getOrders</span>(user.id)</div>
+                    <div>&nbsp;&nbsp;_state.value = <span class="code-func">Success</span>(user, orders)</div>
+                    <div>}</div>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <div class="feature-text">
+                        <h4>同步写法，异步执行</h4>
+                        <p>代码像同步一样简洁，实际异步运行</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-text">
+                        <h4>结构化并发</h4>
+                        <p>自动生命周期管理，减少内存泄漏风险</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌊</div>
+                    <div class="feature-text">
+                        <h4>Flow 背压友好</h4>
+                        <p>按需生产数据，内存更高效</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">
+                        <h4>StateFlow 取代 LiveData</h4>
+                        <p>Kotlin 原生的响应式状态管理</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

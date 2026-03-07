@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15年演进时间线</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .title {
+            font-size: 56px;
+            font-weight: 900;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 80px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .timeline-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        /* 时间线主线 */
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                #ff4444 0%, #ff8844 14%, 
+                #ffaa00 28%, #44ff44 42%, 
+                #00ffcc 56%, #4488ff 70%, 
+                #aa44ff 84%, #ff44ff 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-50%);
+        }
+        
+        .timeline-nodes {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 30px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 140px;
+        }
+        
+        .node-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 24px;
+            color: #ffffff;
+            box-shadow: 0 0 30px currentColor;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .node:nth-child(1) .node-circle { background: linear-gradient(135deg, #ff4444, #cc0000); }
+        .node:nth-child(2) .node-circle { background: linear-gradient(135deg, #ff8844, #cc5500); }
+        .node:nth-child(3) .node-circle { background: linear-gradient(135deg, #ffaa00, #cc8800); }
+        .node:nth-child(4) .node-circle { background: linear-gradient(135deg, #44ff44, #00cc00); }
+        .node:nth-child(5) .node-circle { background: linear-gradient(135deg, #00ffcc, #00aa88); }
+        .node:nth-child(6) .node-circle { background: linear-gradient(135deg, #4488ff, #0044cc); }
+        .node:nth-child(7) .node-circle { background: linear-gradient(135deg, #aa44ff, #6600cc); }
+        
+        .node-year {
+            font-size: 14px;
+            color: #00d4ff;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .node-title {
+            font-size: 13px;
+            color: #ffffff;
+            text-align: center;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        
+        .node:nth-child(odd) {
+            margin-top: -120px;
+        }
+        
+        .node:nth-child(even) {
+            margin-top: 80px;
+        }
+        
+        .node:nth-child(odd) .node-year { order: 2; margin-top: 10px; margin-bottom: 0; }
+        .node:nth-child(odd) .node-title { order: 3; }
+        
+        /* 连接线 */
+        .node::before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .node:nth-child(odd)::before {
+            top: 60px;
+        }
+        
+        .node:nth-child(even)::before {
+            bottom: 80px;
+        }
+        
+        /* 角落装饰 */
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <h1 class="title">15 年演进时间线</h1>
+        
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-nodes">
+                <div class="node">
+                    <div class="node-circle">1</div>
+                    <div class="node-year">2010-2013</div>
+                    <div class="node-title">前架构时代<br>无架构</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">2</div>
+                    <div class="node-year">2013-2016</div>
+                    <div class="node-title">MVP 时代<br>分层启蒙</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">3</div>
+                    <div class="node-year">2014-2017</div>
+                    <div class="node-title">Clean<br>领域驱动</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">4</div>
+                    <div class="node-year">2016-2019</div>
+                    <div class="node-title">MVVM+AAC<br>官方标准</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">5</div>
+                    <div class="node-year">2017-2020</div>
+                    <div class="node-title">RxJava<br>响应式</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">6</div>
+                    <div class="node-year">2019-2022</div>
+                    <div class="node-title">Coroutines<br>协程时代</div>
+                </div>
+                
+                <div class="node">
+                    <div class="node-circle">7</div>
+                    <div class="node-year">2020-2025</div>
+                    <div class="node-title">MVI+Compose<br>现代架构</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

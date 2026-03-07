@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVVM + AAC 时代</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .phase-badge {
+            background: linear-gradient(135deg, #44ff44, #00aa00);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 30px;
+            box-shadow: 0 0 20px rgba(68, 255, 68, 0.4);
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(68, 255, 68, 0.3);
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            gap: 50px;
+        }
+        
+        .diagram-section {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .flow-box {
+            width: 140px;
+            padding: 25px 15px;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .flow-box.view { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .flow-box.viewmodel { background: linear-gradient(135deg, #44ff44, #00aa00); }
+        .flow-box.repository { background: linear-gradient(135deg, #ffaa00, #ff7700); }
+        .flow-box.data { background: linear-gradient(135deg, #00d4ff, #0099cc); }
+        
+        .flow-arrow {
+            font-size: 30px;
+            color: #00d4ff;
+        }
+        
+        .flow-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .features-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .feature-card:nth-child(1) .feature-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .feature-card:nth-child(2) .feature-icon { background: linear-gradient(135deg, #44ff44, #00aa00); }
+        .feature-card:nth-child(3) .feature-icon { background: linear-gradient(135deg, #ffaa00, #ff7700); }
+        .feature-card:nth-child(4) .feature-icon { background: linear-gradient(135deg, #ff4444, #cc0000); }
+        
+        .feature-text h4 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <div class="header">
+            <div class="phase-badge">PHASE 4</div>
+            <h1 class="title">MVVM + AAC (2016-2019)</h1>
+        </div>
+        
+        <div class="content">
+            <div class="diagram-section">
+                <div class="flow-diagram">
+                    <div>
+                        <div class="flow-box view">View<br><small>(Activity/Fragment)</small></div>
+                        <div class="flow-label">观察数据</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div>
+                        <div class="flow-box viewmodel">ViewModel</div>
+                        <div class="flow-label">生命周期感知</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div>
+                        <div class="flow-box repository">Repository</div>
+                        <div class="flow-label">统一数据源</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div>
+                        <div class="flow-box data">Data Source<br><small>(网络/本地)</small></div>
+                        <div class="flow-label">Room/Retrofit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">
+                        <h4>ViewModel 生命周期感知</h4>
+                        <p>屏幕旋转等配置变更后依然存活，数据不丢失</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-text">
+                        <h4>LiveData 响应式数据流</h4>
+                        <p>自动处理生命周期，避免内存泄漏</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-text">
+                        <h4>Repository 统一数据源</h4>
+                        <p>配合 Room 实现离线优先</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚠️</div>
+                    <div class="feature-text">
+                        <h4>DataBinding 可读性争议</h4>
+                        <p>XML 中写逻辑，维护困难</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

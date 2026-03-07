@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVI + Jetpack Compose</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .phase-badge {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-right: 30px;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+            gap: 50px;
+        }
+        
+        .state-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .state-machine {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .state-circle {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .state-circle.state { 
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .state-circle.ui { 
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+        }
+        .state-circle.event { 
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .state-circle.update { 
+            background: linear-gradient(135deg, #10b981, #059669);
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+        
+        .state-circle .icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .state-circle .label {
+            font-size: 14px;
+        }
+        
+        .arrow {
+            position: absolute;
+            font-size: 36px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .arrow.right { top: 50%; right: 130px; transform: translateY(-50%); }
+        .arrow.down { bottom: 130px; left: 50%; transform: translateX(-50%); }
+        .arrow.left { top: 50%; left: 130px; transform: translateY(-50%) rotate(180deg); }
+        .arrow.up { top: 130px; left: 50%; transform: translateX(-50%) rotate(-90deg); }
+        
+        .features-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .feature-card {
+            display: flex;
+            align-items: center;
+            padding: 22px 25px;
+            margin-bottom: 18px;
+            background: rgba(236, 72, 153, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(236, 72, 153, 0.2);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        }
+        
+        .feature-text h4 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            color: #f9a8d4;
+            font-size: 14px;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(236, 72, 153, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <div class="header">
+            <div class="phase-badge">PHASE 7</div>
+            <h1 class="title">MVI + Jetpack Compose (2020-2025)</h1>
+        </div>
+        
+        <div class="content">
+            <div class="state-section">
+                <div class="state-machine">
+                    <div class="state-circle state">
+                        <div class="icon">📊</div>
+                        <div class="label">State</div>
+                    </div>
+                    <div class="state-circle ui">
+                        <div class="icon">🎨</div>
+                        <div class="label">UI</div>
+                    </div>
+                    <div class="state-circle event">
+                        <div class="icon">👆</div>
+                        <div class="label">Event</div>
+                    </div>
+                    <div class="state-circle update">
+                        <div class="icon">🔄</div>
+                        <div class="label">Update</div>
+                    </div>
+                    <div class="arrow right">→</div>
+                    <div class="arrow down">→</div>
+                    <div class="arrow left">→</div>
+                    <div class="arrow up">→</div>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-text">
+                        <h4>声明式 UI 开发</h4>
+                        <p>Jetpack Compose 用 Kotlin 代码描述 UI</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <div class="feature-text">
+                        <h4>单一可信数据源 SSOT</h4>
+                        <p>整个 UI 状态集中管理，避免状态分散</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text">
+                        <h4>状态机驱动</h4>
+                        <p>状态变化可预测、可追溯</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-text">
+                        <h4>副作用隔离</h4>
+                        <p>SideEffect、LaunchedEffect 让副作用可控</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

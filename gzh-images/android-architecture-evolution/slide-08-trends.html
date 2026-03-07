@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5条演进主线</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .title {
+            font-size: 56px;
+            font-weight: 900;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 60px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px;
+            flex: 1;
+        }
+        
+        .trend-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .trend-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .trend-card:nth-child(1) { border-color: rgba(0, 212, 255, 0.3); }
+        .trend-card:nth-child(2) { border-color: rgba(0, 255, 136, 0.3); }
+        .trend-card:nth-child(3) { border-color: rgba(255, 170, 0, 0.3); }
+        .trend-card:nth-child(4) { border-color: rgba(236, 72, 153, 0.3); }
+        .trend-card:nth-child(5) { border-color: rgba(168, 85, 247, 0.3); }
+        
+        .trend-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 25px;
+        }
+        
+        .trend-card:nth-child(1) .trend-icon { 
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        .trend-card:nth-child(2) .trend-icon { 
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+        .trend-card:nth-child(3) .trend-icon { 
+            background: linear-gradient(135deg, #ffaa00, #cc8800);
+            box-shadow: 0 10px 30px rgba(255, 170, 0, 0.3);
+        }
+        .trend-card:nth-child(4) .trend-icon { 
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
+        }
+        .trend-card:nth-child(5) .trend-icon { 
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+        
+        .trend-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .trend-desc {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+        
+        .arrow-down {
+            font-size: 24px;
+            margin: 10px 0;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <h1 class="title">5 条演进主线</h1>
+        
+        <div class="trends-grid">
+            <div class="trend-card">
+                <div class="trend-icon">🏗️</div>
+                <div class="trend-title">架构化</div>
+                <div class="trend-desc">混乱</div>
+                <div class="arrow-down">↓</div>
+                <div class="trend-desc">有序<br>分层架构</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-icon">🤖</div>
+                <div class="trend-title">自动化</div>
+                <div class="trend-desc">手动管理</div>
+                <div class="arrow-down">↓</div>
+                <div class="trend-desc">自动<br>依赖注入</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-icon">🌊</div>
+                <div class="trend-title">响应式</div>
+                <div class="trend-desc">回调地狱</div>
+                <div class="arrow-down">↓</div>
+                <div class="trend-desc">响应式<br>RxJava/Flow</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-icon">🎨</div>
+                <div class="trend-title">声明式</div>
+                <div class="trend-desc">命令式 XML</div>
+                <div class="arrow-down">↓</div>
+                <div class="trend-desc">声明式<br>Compose</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-icon">🎯</div>
+                <div class="trend-title">集中化</div>
+                <div class="trend-desc">多数据源</div>
+                <div class="arrow-down">↓</div>
+                <div class="trend-desc">单一数据源<br>SSOT</div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

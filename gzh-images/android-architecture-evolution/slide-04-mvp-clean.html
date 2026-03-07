@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP vs Clean Architecture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0d0d1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .title {
+            font-size: 56px;
+            font-weight: 900;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .comparison-container {
+            display: flex;
+            flex: 1;
+            gap: 40px;
+            align-items: stretch;
+        }
+        
+        .column {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .column-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .column-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        
+        .column-subtitle {
+            font-size: 16px;
+            color: #888;
+        }
+        
+        .mvp .column-title { color: #ffaa00; }
+        .clean .column-title { color: #00d4ff; }
+        
+        .feature-list {
+            flex: 1;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .feature-text h4 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .feature-text p {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .vs-divider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+        }
+        
+        .vs-line {
+            width: 2px;
+            flex: 1;
+            background: linear-gradient(180deg, transparent, #00d4ff, transparent);
+        }
+        
+        .vs-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+            color: #0d0d1a;
+            margin: 10px 0;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .corner.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .corner.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .corner.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .corner.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        
+        <h1 class="title">MVP → Clean Architecture</h1>
+        
+        <div class="comparison-container">
+            <div class="column mvp">
+                <div class="column-header">
+                    <div class="column-title">MVP</div>
+                    <div class="column-subtitle">2013-2016</div>
+                </div>
+                <div class="feature-list">
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">
+                            <h4>Activity 瘦身成功</h4>
+                            <p>View 层只负责 UI 渲染，逻辑移到 Presenter</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">
+                            <h4>Presenter 可测试</h4>
+                            <p>业务逻辑独立，可以写单元测试</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⚠️</div>
+                        <div class="feature-text">
+                            <h4>内存泄漏风险</h4>
+                            <p>Presenter 持有 View 引用，生命周期管理不当会泄漏</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⚠️</div>
+                        <div class="feature-text">
+                            <h4>回调嵌套</h4>
+                            <p>复杂业务下回调嵌套成"金字塔"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vs-divider">
+                <div class="vs-line"></div>
+                <div class="vs-circle">→</div>
+                <div class="vs-line"></div>
+            </div>
+            
+            <div class="column clean">
+                <div class="column-header">
+                    <div class="column-title">Clean + Dagger</div>
+                    <div class="column-subtitle">2014-2017</div>
+                </div>
+                <div class="feature-list">
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">
+                            <h4>业务独立于框架</h4>
+                            <p>Domain 层不依赖 Android 框架，可复用性强</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">
+                            <h4>Repository 模式</h4>
+                            <p>统一封装网络和本地数据源</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-text">
+                            <h4>依赖注入</h4>
+                            <p>Dagger 自动化依赖管理</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">⚠️</div>
+                        <div class="feature-text">
+                            <h4>分层复杂</h4>
+                            <p>开发成本高，小项目"小题大做"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

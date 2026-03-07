@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android 架构 15 年 - 封面</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 100px rgba(0, 212, 255, 0.1);
+        }
+        
+        /* 背景网格 */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        /* 发光圆环装饰 */
+        .glow-ring {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 
+                0 0 60px rgba(0, 212, 255, 0.1),
+                inset 0 0 60px rgba(0, 212, 255, 0.05);
+        }
+        
+        .glow-ring-2 {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Android 机器人 */
+        .android-robot {
+            position: absolute;
+            left: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 180px;
+            height: 220px;
+            opacity: 0.9;
+        }
+        
+        .robot-head {
+            width: 100px;
+            height: 50px;
+            background: linear-gradient(180deg, #3ddc84 0%, #2cb86a 100%);
+            border-radius: 50px 50px 0 0;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 30px rgba(61, 220, 132, 0.4);
+        }
+        
+        .robot-antenna {
+            position: absolute;
+            width: 4px;
+            height: 20px;
+            background: #3ddc84;
+            top: -18px;
+        }
+        
+        .robot-antenna.left { left: 25px; transform: rotate(-20deg); }
+        .robot-antenna.right { right: 25px; transform: rotate(20deg); }
+        
+        .robot-eye {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0d0d1a;
+            border-radius: 50%;
+            top: 20px;
+        }
+        
+        .robot-eye.left { left: 25px; }
+        .robot-eye.right { right: 25px; }
+        
+        .robot-body {
+            width: 100px;
+            height: 90px;
+            background: linear-gradient(180deg, #3ddc84 0%, #2cb86a 100%);
+            border-radius: 0 0 20px 20px;
+            margin: 5px auto 0;
+            position: relative;
+            box-shadow: 0 0 30px rgba(61, 220, 132, 0.3);
+        }
+        
+        .robot-arm {
+            position: absolute;
+            width: 25px;
+            height: 70px;
+            background: linear-gradient(180deg, #3ddc84 0%, #2cb86a 100%);
+            border-radius: 20px;
+            top: 5px;
+        }
+        
+        .robot-arm.left { left: -30px; }
+        .robot-arm.right { right: -30px; }
+        
+        .robot-leg {
+            position: absolute;
+            width: 25px;
+            height: 50px;
+            background: linear-gradient(180deg, #3ddc84 0%, #2cb86a 100%);
+            border-radius: 0 0 20px 20px;
+            bottom: -45px;
+        }
+        
+        .robot-leg.left { left: 15px; }
+        .robot-leg.right { right: 15px; }
+        
+        /* 主标题区域 */
+        .content {
+            text-align: center;
+            z-index: 10;
+            margin-left: 100px;
+        }
+        
+        .main-title {
+            font-size: 96px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 
+                0 0 20px rgba(0, 212, 255, 0.5),
+                0 0 40px rgba(0, 212, 255, 0.3),
+                0 0 60px rgba(0, 212, 255, 0.2);
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #ffffff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 36px;
+            color: #00d4ff;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        
+        /* 装饰代码元素 */
+        .code-decoration {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: rgba(0, 255, 136, 0.3);
+            right: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            line-height: 1.8;
+            text-align: left;
+        }
+        
+        /* 底部装饰线 */
+        .bottom-line {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+        }
+        
+        /* 角落装饰 */
+        .corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .corner.top-left {
+            top: 40px;
+            left: 40px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner.top-right {
+            top: 40px;
+            right: 40px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner.bottom-left {
+            bottom: 40px;
+            left: 40px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner.bottom-right {
+            bottom: 40px;
+            right: 40px;
+            border-left: none;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="grid-bg"></div>
+        <div class="glow-ring"></div>
+        <div class="glow-ring-2"></div>
+        
+        <!-- Android 机器人 -->
+        <div class="android-robot">
+            <div class="robot-head">
+                <div class="robot-antenna left"></div>
+                <div class="robot-antenna right"></div>
+                <div class="robot-eye left"></div>
+                <div class="robot-eye right"></div>
+            </div>
+            <div class="robot-body">
+                <div class="robot-arm left"></div>
+                <div class="robot-arm right"></div>
+                <div class="robot-leg left"></div>
+                <div class="robot-leg right"></div>
+            </div>
+        </div>
+        
+        <!-- 主内容 -->
+        <div class="content">
+            <h1 class="main-title">Android 架构 15 年</h1>
+            <p class="subtitle">7 个阶段的完整演进之路</p>
+        </div>
+        
+        <!-- 代码装饰 -->
+        <div class="code-decoration">
+            <div>class Architecture {</div>
+            <div>&nbsp;&nbsp;fun evolve() {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;// 2010-2025</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;fromChaosToOrder()</div>
+            <div>&nbsp;&nbsp;}</div>
+            <div>}</div>
+        </div>
+        
+        <!-- 装饰元素 -->
+        <div class="bottom-line"></div>
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+    </div>
+</body>
+</html>

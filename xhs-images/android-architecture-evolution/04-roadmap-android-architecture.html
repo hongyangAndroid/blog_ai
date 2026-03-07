@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习路线推荐</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f7f6f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .xhs-card {
+            width: 900px;
+            height: 1200px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 22px;
+            color: #9b9b9b;
+        }
+        
+        .roadmap-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+        
+        .roadmap-container::before {
+            content: '';
+            position: absolute;
+            left: 35px;
+            top: 40px;
+            bottom: 40px;
+            width: 4px;
+            background: linear-gradient(180deg, 
+                #4caf50 0%, 
+                #8bc34a 25%,
+                #cddc39 50%,
+                #ffc107 75%,
+                #ff5722 100%);
+            border-radius: 2px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            padding: 20px 0;
+        }
+        
+        .step-number {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .step:nth-child(1) .step-number { background: linear-gradient(135deg, #4caf50, #66bb6a); }
+        .step:nth-child(2) .step-number { background: linear-gradient(135deg, #8bc34a, #9ccc65); }
+        .step:nth-child(3) .step-number { background: linear-gradient(135deg, #cddc39, #d4e157); color: #333; }
+        .step:nth-child(4) .step-number { background: linear-gradient(135deg, #ffc107, #ffca28); color: #333; }
+        .step:nth-child(5) .step-number { background: linear-gradient(135deg, #ff5722, #ff7043); }
+        
+        .step-content {
+            flex: 1;
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 25px 30px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .step-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .step-icon {
+            font-size: 28px;
+        }
+        
+        .step-desc {
+            font-size: 18px;
+            color: #6b6b6b;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #fff8e1, #ffecb3);
+            border-radius: 16px;
+            border: 2px solid #ffe082;
+        }
+        
+        .cta-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e16259;
+            margin-bottom: 15px;
+        }
+        
+        .cta-sub {
+            font-size: 20px;
+            color: #6b6b6b;
+        }
+        
+        .bookmark {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            font-size: 40px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="xhs-card">
+        <div class="grid-bg"></div>
+        <div class="bookmark">🔖</div>
+        
+        <div class="content">
+            <div class="header">
+                <h1 class="title">给初级开发者的学习建议 📚</h1>
+                <p class="subtitle">循序渐进，从基础到进阶</p>
+            </div>
+            
+            <div class="roadmap-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">
+                            <span class="step-icon">🌱</span>
+                            学习 MVP
+                        </div>
+                        <div class="step-desc">理解分层思想，掌握关注点分离的基本原则</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">
+                            <span class="step-icon">📖</span>
+                            掌握 MVVM + Lifecycle
+                        </div>
+                        <div class="step-desc">深入理解生命周期感知和响应式编程</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">
+                            <span class="step-icon">🏗️</span>
+                            深入 Clean Architecture
+                        </div>
+                        <div class="step-desc">理解领域驱动设计，掌握业务与框架解耦</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">
+                            <span class="step-icon">⚡</span>
+                            进阶 Coroutines + Flow
+                        </div>
+                        <div class="step-desc">掌握 Kotlin 协程和响应式流处理</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">
+                            <span class="step-icon">🎯</span>
+                            探索 MVI + Compose
+                        </div>
+                        <div class="step-desc">掌握声明式UI和单向数据流架构</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <div class="cta-text">⭐ 收藏这份路线图，架构升级不迷路 ⭐</div>
+                <div class="cta-sub">你在哪个阶段？评论区聊聊你的学习心得 👇</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
