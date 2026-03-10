@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>3步上手Skill</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1080px;
+      height: 1440px;
+      margin: 0;
+      overflow: hidden;
+      background: #faf9f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      position: relative;
+    }
+    
+    .grid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      padding: 100px 80px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    
+    .title {
+      font-size: 64px;
+      font-weight: 700;
+      color: #2c2c2c;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    
+    .subtitle {
+      font-size: 28px;
+      color: #888;
+    }
+    
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      margin-bottom: 80px;
+    }
+    
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    
+    .step-number {
+      width: 100px;
+      height: 100px;
+      background: #2c2c2c;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    
+    .step-content {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #eee;
+    }
+    
+    .step-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: #2c2c2c;
+      margin-bottom: 12px;
+    }
+    
+    .step-desc {
+      font-size: 26px;
+      color: #666;
+    }
+    
+    .arrow {
+      text-align: center;
+      font-size: 40px;
+      color: #ccc;
+      margin: -20px 0;
+    }
+    
+    .example-box {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 40px;
+      border: 2px dashed #ddd;
+    }
+    
+    .example-label {
+      font-size: 22px;
+      color: #888;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .example-text {
+      font-size: 28px;
+      color: #2c2c2c;
+      font-weight: 500;
+    }
+    
+    .example-highlight {
+      background: linear-gradient(transparent 60%, rgba(255, 220, 100, 0.4) 60%);
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1 class="title">3步上手 Skill</h1>
+      <p class="subtitle">实操指南</p>
+    </div>
+    
+    <div class="steps-container">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">安装 TraeCN</div>
+          <div class="step-desc">准备好你的AI助手</div>
+        </div>
+      </div>
+      
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">安装 Skill</div>
+          <div class="step-desc">直接和AI说安装链接，AI自动完成</div>
+        </div>
+      </div>
+      
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-title">使用 Skill</div>
+          <div class="step-desc">发内容给AI，等待生成结果</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="example-box">
+      <div class="example-label">示例</div>
+      <div class="example-text">
+        用 <span class="example-highlight">baoyu-xhs-images</span> skill<br>
+        将文章转为小红书图文
+      </div>
+    </div>
+  </div>
+</body>
+</html>

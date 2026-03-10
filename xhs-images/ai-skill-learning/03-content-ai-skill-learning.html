@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>什么是Skill？</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1080px;
+      height: 1440px;
+      margin: 0;
+      overflow: hidden;
+      background: #faf9f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      position: relative;
+    }
+    
+    .grid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      padding: 100px 80px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 100px;
+    }
+    
+    .title {
+      font-size: 64px;
+      font-weight: 700;
+      color: #2c2c2c;
+      letter-spacing: -1px;
+    }
+    
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    
+    .concept-card {
+      background: white;
+      border-radius: 20px;
+      padding: 50px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .concept-icon {
+      font-size: 64px;
+      margin-bottom: 30px;
+    }
+    
+    .concept-label {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2c2c2c;
+      margin-bottom: 20px;
+      background: linear-gradient(transparent 60%, rgba(255, 220, 100, 0.4) 60%);
+      padding: 0 8px;
+    }
+    
+    .concept-desc {
+      font-size: 26px;
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .center-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: #2c2c2c;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      color: white;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1 class="title">什么是 Skill？</h1>
+    </div>
+    
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📋</div>
+        <div class="concept-label">本质</div>
+        <div class="concept-desc">AI的某项技能<br>规定固定流程</div>
+      </div>
+      
+      <div class="concept-card">
+        <div class="concept-icon">📝</div>
+        <div class="concept-label">形式</div>
+        <div class="concept-desc">md文件<br>纯文本</div>
+      </div>
+      
+      <div class="concept-card">
+        <div class="concept-icon">🚀</div>
+        <div class="concept-label">能力</div>
+        <div class="concept-desc">无限可能<br>可不断优化</div>
+      </div>
+      
+      <div class="concept-card">
+        <div class="concept-icon">🎯</div>
+        <div class="concept-label">作用</div>
+        <div class="concept-desc">让AI按你的要求<br>做好某事</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

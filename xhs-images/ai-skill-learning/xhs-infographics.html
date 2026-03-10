@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI入门Skill学习 - 小红书信息图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f5f0e8 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #5d4e37;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #8b7d6b;
+            font-size: 14px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f4a460 0%, #e8913a 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 164, 96, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 164, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #a8d8ea 0%, #8ac6d1 100%);
+            box-shadow: 0 4px 15px rgba(168, 216, 234, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(168, 216, 234, 0.4);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            justify-items: center;
+        }
+
+        /* 小红书卡片基础样式 */
+        .xhs-card {
+            width: 375px;
+            height: 500px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .xhs-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Warm风格渐变背景 */
+        .warm-bg-1 {
+            background: linear-gradient(180deg, #fff9f0 0%, #ffe8d6 50%, #ffd4b8 100%);
+        }
+
+        .warm-bg-2 {
+            background: linear-gradient(180deg, #fdf6f0 0%, #fae5d3 50%, #f5d5c0 100%);
+        }
+
+        .warm-bg-3 {
+            background: linear-gradient(180deg, #fffdf5 0%, #fff3e0 50%, #ffe4c4 100%);
+        }
+
+        .warm-bg-4 {
+            background: linear-gradient(180deg, #fff8f0 0%, #ffecd2 50%, #ffd9a8 100%);
+        }
+
+        .warm-bg-5 {
+            background: linear-gradient(180deg, #fff5f0 0%, #ffe8e0 50%, #ffd4c4 100%);
+        }
+
+        /* 装饰元素 */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            opacity: 0.6;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+        }
+
+        .star {
+            position: absolute;
+            color: #f4d03f;
+            font-size: 20px;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* 卡片内容 */
+        .card-content {
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(244, 164, 96, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #5d4e37;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #8b7355;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* 图标样式 */
+        .icon-large {
+            font-size: 80px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .icon-medium {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        /* 内容块 */
+        .content-block {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .content-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 12px 0;
+            font-size: 14px;
+            color: #5d4e37;
+            line-height: 1.6;
+        }
+
+        .content-item .icon {
+            margin-right: 10px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* 流程步骤 */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 12px 15px;
+            border-radius: 12px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #f4a460 0%, #e8913a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #5d4e37;
+            font-size: 14px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: #8b7355;
+            margin-top: 2px;
+        }
+
+        /* 对比布局 */
+        .comparison {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .comparison-item {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .comparison-item .label {
+            font-size: 12px;
+            color: #8b7355;
+            margin-bottom: 8px;
+        }
+
+        .comparison-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5d4e37;
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #f4a460 0%, #e8913a 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 3px;
+        }
+
+        /* 底部信息 */
+        .footer-info {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .github-link {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #5d4e37;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 特殊效果 */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(244, 164, 96, 0.2) 0%, rgba(232, 145, 58, 0.2) 100%);
+            border: 2px dashed #f4a460;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 24px;
+            color: #f4a460;
+            margin: 10px 0;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .xhs-card {
+                width: 100%;
+                max-width: 375px;
+            }
+        }
+
+        /* 打印/截图优化 */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .controls {
+                display: none;
+            }
+            
+            .gallery {
+                display: block;
+            }
+            
+            .xhs-card {
+                margin-bottom: 30px;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦞 AI入门Skill学习 - 小红书信息图</h1>
+            <p>基于鸿洋文章《我愿称它为AI时代最该学的！》生成</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="downloadAll()">📥 下载全部图片</button>
+            <button class="btn btn-secondary" onclick="toggleAnimation()">✨ 切换动画</button>
+        </div>
+
+        <div class="gallery">
+            <!-- 卡片1: 封面 -->
+            <div class="xhs-card warm-bg-1" id="card1">
+                <div class="cloud" style="width: 80px; height: 40px; top: 30px; left: 20px;"></div>
+                <div class="cloud" style="width: 60px; height: 30px; top: 60px; right: 30px;"></div>
+                <div class="star" style="top: 80px; left: 50px;">✦</div>
+                <div class="star" style="top: 120px; right: 60px; animation-delay: 0.5s;">✦</div>
+                <div class="star" style="top: 40px; right: 100px; animation-delay: 1s;">✦</div>
+                
+                <div class="card-content">
+                    <div class="card-number">1</div>
+                    <div class="icon-large">🤔➡️💡</div>
+                    <h2 class="title">AI入门别急着装OpenClaw！</h2>
+                    <p class="subtitle">我踩过的坑你别踩</p>
+                    
+                    <div class="highlight-box">
+                        <span style="font-size: 48px;">🦞</span>
+                        <p style="margin-top: 10px; color: #8b7355;">AI时代最该学的是 Skill</p>
+                    </div>
+                    
+                    <div class="footer-info">
+                        <span class="tag">#AI入门</span>
+                        <span class="tag">#Skill学习</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片2: 痛点 -->
+            <div class="xhs-card warm-bg-2" id="card2">
+                <div class="cloud" style="width: 70px; height: 35px; top: 40px; right: 20px;"></div>
+                <div class="star" style="top: 100px; left: 30px;">✦</div>
+                <div class="star" style="top: 60px; right: 80px; animation-delay: 0.3s;">✦</div>
+                
+                <div class="card-content">
+                    <div class="card-number">2</div>
+                    <h2 class="title" style="font-size: 22px;">安装OpenClaw后的迷茫循环</h2>
+                    
+                    <div style="text-align: center; margin: 15px 0;">
+                        <span style="font-size: 60px;">😵‍💫</span>
+                    </div>
+                    
+                    <div class="content-block">
+                        <div class="content-item">
+                            <span class="icon">❌</span>
+                            <span>安装很简单，但<strong>不知道怎么用</strong></span>
+                        </div>
+                        <div class="content-item">
+                            <span class="icon">🔄</span>
+                            <span>盲目装Skill，好像能干活又<strong>好像不能</strong></span>
+                        </div>
+                        <div class="content-item">
+                            <span class="icon">😰</span>
+                            <span>陷入无尽循环，学了<strong>又好像没学</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 15px;">
+                        <span style="font-size: 40px;">↻↻↻</span>
+                        <p style="color: #8b7355; font-size: 12px; margin-top: 5px;">你是不是也这样？</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片3: 转折 -->
+            <div class="xhs-card warm-bg-3" id="card3">
+                <div class="cloud" style="width: 90px; height: 45px; top: 20px; left: 30px;"></div>
+                <div class="star" style="top: 50px; right: 40px;">✦</div>
+                <div class="star" style="top: 100px; left: 40px; animation-delay: 0.5s;">✦</div>
+                <div class="star" style="bottom: 100px; right: 50px; animation-delay: 1s;">✦</div>
+                
+                <div class="card-content">
+                    <div class="card-number">3</div>
+                    <h2 class="title" style="font-size: 22px;">发现Skill才是正确打开方式！</h2>
+                    
+                    <div style="text-align: center; margin: 10px 0;">
+                        <span style="font-size: 70px; filter: drop-shadow(0 0 20px rgba(244, 164, 96, 0.5));">💡</span>
+                    </div>
+                    
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">什么是Skill？</div>
+                                <div class="step-desc">AI的技能说明书 📖</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Skill规定了</div>
+                                <div class="step-desc">AI按固定流程做事 📝</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">不断优化</div>
+                                <div class="step-desc">提升做事稳定性 📈</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <span style="font-size: 24px;">原来如此！✨</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片4: 体验 -->
+            <div class="xhs-card warm-bg-4" id="card4">
+                <div class="cloud" style="width: 75px; height: 38px; top: 35px; right: 25px;"></div>
+                <div class="star" style="top: 70px; left: 35px;">✦</div>
+                <div class="star" style="top: 45px; right: 90px; animation-delay: 0.7s;">✦</div>
+                
+                <div class="card-content">
+                    <div class="card-number">4</div>
+                    <h2 class="title" style="font-size: 22px;">亲测Skill的神奇效果</h2>
+                    
+                    <div class="steps" style="margin: 15px 0;">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">安装TraeCN</div>
+                                <div class="step-desc">准备AI编程环境 💻</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">安装baoyu-xhs-images Skill</div>
+                                <div class="step-desc">文章转小红书图 🎨</div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">发送文章，AI自动干活</div>
+                                <div class="step-desc">效果超出预期！✨</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison">
+                        <div class="comparison-item">
+                            <div class="label">输入 📄</div>
+                            <div class="value">微信文章链接</div>
+                        </div>
+                        <div class="comparison-item">
+                            <div class="label">输出 ✨</div>
+                            <div class="value">精美信息图</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <span style="font-size: 20px;">🍽️ 吃饭回来就完成！</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片5: 结论 -->
+            <div class="xhs-card warm-bg-5" id="card5">
+                <div class="cloud" style="width: 85px; height: 42px; top: 25px; left: 25px;"></div>
+                <div class="cloud" style="width: 65px; height: 32px; bottom: 80px; right: 20px;"></div>
+                <div class="star" style="top: 60px; right: 50px;">✦</div>
+                <div class="star" style="top: 110px; left: 45px; animation-delay: 0.4s;">✦</div>
+                <div class="star" style="bottom: 120px; left: 60px; animation-delay: 0.8s;">✦</div>
+                
+                <div class="card-content">
+                    <div class="card-number">5</div>
+                    <h2 class="title" style="font-size: 20px;">学会"拿来吧你"<br>复制别人的技能！</h2>
+                    
+                    <div style="text-align: center; margin: 10px 0;">
+                        <span style="font-size: 50px;">🤲✨</span>
+                    </div>
+                    
+                    <div class="content-block">
+                        <div class="content-item">
+                            <span class="icon">📄</span>
+                            <span><strong>Skill就是md文件</strong><br>纯文本但能力无限</span>
+                        </div>
+                        <div class="content-item">
+                            <span class="icon">⭐</span>
+                            <span><strong>收藏别人的Skill</strong><br>改造为己所用</span>
+                        </div>
+                        <div class="content-item">
+                            <span class="icon">🚀</span>
+                            <span><strong>开启AI自媒体之路</strong><br>让AI 24小时待命</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-info">
+                        <div class="github-link">
+                            <span>🔗</span>
+                            <span>github.com/hongyangAndroid/blog_ai</span>
+                        </div>
+                        <p style="margin-top: 15px; color: #d35400; font-weight: 600;">现在就试试！🎯</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        let animationEnabled = true;
+
+        function toggleAnimation() {
+            animationEnabled = !animationEnabled;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.style.animation = animationEnabled ? 'twinkle 2s ease-in-out infinite' : 'none';
+            });
+        }
+
+        async function downloadCard(cardId, filename) {
+            const card = document.getElementById(cardId);
+            try {
+                const canvas = await html2canvas(card, {
+                    scale: 2,
+                    backgroundColor: null,
+                    logging: false
+                });
+                
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                console.error('下载失败:', err);
+                alert('下载失败，请尝试截图保存');
+            }
+        }
+
+        async function downloadAll() {
+            const cards = [
+                { id: 'card1', name: '01-cover-ai-skill-learning.png' },
+                { id: 'card2', name: '02-painpoint-ai-skill-learning.png' },
+                { id: 'card3', name: '03-discovery-ai-skill-learning.png' },
+                { id: 'card4', name: '04-experience-ai-skill-learning.png' },
+                { id: 'card5', name: '05-conclusion-ai-skill-learning.png' }
+            ];
+
+            for (const card of cards) {
+                await downloadCard(card.id, card.name);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        // 添加鼠标悬停效果
+        document.querySelectorAll('.xhs-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

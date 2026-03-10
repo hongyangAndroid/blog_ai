@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>AI时代最该学的不是OpenClaw，而是Skill</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1080px;
+      height: 1440px;
+      margin: 0;
+      overflow: hidden;
+      background: #faf9f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      position: relative;
+    }
+    
+    /* Grid background */
+    .grid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    /* Decorative elements */
+    .deco-circle {
+      position: absolute;
+      border: 2px solid #e5e5e5;
+      border-radius: 50%;
+    }
+    
+    .deco-circle-1 {
+      width: 120px;
+      height: 120px;
+      top: 80px;
+      right: 100px;
+    }
+    
+    .deco-circle-2 {
+      width: 60px;
+      height: 60px;
+      bottom: 150px;
+      left: 80px;
+      background: rgba(0,0,0,0.03);
+    }
+    
+    .deco-line {
+      position: absolute;
+      background: #e5e5e5;
+    }
+    
+    .deco-line-1 {
+      width: 100px;
+      height: 2px;
+      top: 200px;
+      left: 60px;
+      transform: rotate(-15deg);
+    }
+    
+    .deco-line-2 {
+      width: 80px;
+      height: 2px;
+      bottom: 300px;
+      right: 60px;
+      transform: rotate(10deg);
+    }
+    
+    .deco-rect {
+      position: absolute;
+      border: 2px solid #e5e5e5;
+      width: 40px;
+      height: 40px;
+      top: 350px;
+      right: 150px;
+      transform: rotate(15deg);
+    }
+    
+    /* Main content */
+    .container {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px;
+    }
+    
+    .icon-wrapper {
+      margin-bottom: 60px;
+    }
+    
+    .icon {
+      width: 100px;
+      height: 100px;
+      border: 3px solid #2c2c2c;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    
+    .main-title {
+      font-size: 72px;
+      font-weight: 700;
+      color: #2c2c2c;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 40px;
+      letter-spacing: -1px;
+    }
+    
+    .highlight {
+      background: linear-gradient(transparent 60%, rgba(255, 220, 100, 0.4) 60%);
+      padding: 0 10px;
+    }
+    
+    .subtitle {
+      font-size: 32px;
+      color: #666;
+      text-align: center;
+      font-weight: 400;
+      letter-spacing: 4px;
+    }
+    
+    .subtitle-dot {
+      margin: 0 12px;
+      color: #ccc;
+    }
+    
+    .bottom-note {
+      position: absolute;
+      bottom: 80px;
+      font-size: 20px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  
+  <!-- Decorative elements -->
+  <div class="deco-circle deco-circle-1"></div>
+  <div class="deco-circle deco-circle-2"></div>
+  <div class="deco-line deco-line-1"></div>
+  <div class="deco-line deco-line-2"></div>
+  <div class="deco-rect"></div>
+  
+  <div class="container">
+    <div class="icon-wrapper">
+      <div class="icon">💡</div>
+    </div>
+    
+    <h1 class="main-title">
+      AI时代最该学的<br>
+      不是<span class="highlight">OpenClaw</span>，<br>
+      而是<span class="highlight">Skill</span>
+    </h1>
+    
+    <p class="subtitle">
+      3步上手<span class="subtitle-dot">·</span>零代码<span class="subtitle-dot">·</span>效率翻倍
+    </p>
+    
+    <div class="bottom-note">鸿洋 · AI入门指南</div>
+  </div>
+</body>
+</html>

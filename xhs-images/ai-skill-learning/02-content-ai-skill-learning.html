@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>为什么OpenClaw不适合入门？</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1080px;
+      height: 1440px;
+      margin: 0;
+      overflow: hidden;
+      background: #faf9f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      position: relative;
+    }
+    
+    .grid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      padding: 100px 80px;
+    }
+    
+    .header {
+      margin-bottom: 80px;
+    }
+    
+    .title {
+      font-size: 56px;
+      font-weight: 700;
+      color: #2c2c2c;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    
+    .subtitle {
+      font-size: 28px;
+      color: #888;
+      font-weight: 400;
+    }
+    
+    .content-list {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 30px;
+      padding: 40px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid #eee;
+    }
+    
+    .item-icon {
+      font-size: 48px;
+      flex-shrink: 0;
+      width: 60px;
+      text-align: center;
+    }
+    
+    .item-text {
+      font-size: 32px;
+      color: #2c2c2c;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+    
+    .item-negative .item-icon {
+      color: #e74c3c;
+    }
+    
+    .item-positive {
+      background: #f0f9f4;
+      border-color: #d4edda;
+    }
+    
+    .item-positive .item-icon {
+      color: #27ae60;
+    }
+    
+    .loop-diagram {
+      position: absolute;
+      right: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 200px;
+      height: 200px;
+      opacity: 0.1;
+    }
+    
+    .loop-arrow {
+      width: 100%;
+      height: 100%;
+      border: 4px solid #2c2c2c;
+      border-radius: 50%;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      transform: rotate(45deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1 class="title">为什么OpenClaw不适合入门？</h1>
+      <p class="subtitle">认清现实，避开弯路</p>
+    </div>
+    
+    <div class="content-list">
+      <div class="item item-negative">
+        <div class="item-icon">❌</div>
+        <div class="item-text">安装简单，但做复杂事需要熟练各种AI工具</div>
+      </div>
+      
+      <div class="item item-negative">
+        <div class="item-icon">❌</div>
+        <div class="item-text">容易陷入"装skill→不会用→找新skill"的死循环</div>
+      </div>
+      
+      <div class="item item-negative">
+        <div class="item-icon">❌</div>
+        <div class="item-text">纯小白安装后往往迷茫焦虑</div>
+      </div>
+      
+      <div class="item item-positive">
+        <div class="item-icon">✅</div>
+        <div class="item-text">更适合有AI工具基础的人</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
