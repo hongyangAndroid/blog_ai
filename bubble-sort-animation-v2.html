@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冒泡排序算法演示 - Bubble Sort Algorithm Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fafbfc 0%, #f0f2f5 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 300;
+            color: #1a1a2e;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .sub-title {
+            font-size: 1.5rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* 可视化区域 */
+        .visualization-area {
+            width: 90%;
+            max-width: 1400px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 60px 80px;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* 数据柱子 */
+        .data-bar {
+            flex: 1;
+            max-width: 120px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px 16px 0 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .data-bar::before {
+            content: attr(data-value);
+            position: absolute;
+            top: -40px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .data-bar::after {
+            content: attr(data-index);
+            position: absolute;
+            bottom: -35px;
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+
+        .data-bar.comparing {
+            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 30px rgba(245, 87, 108, 0.5);
+            transform: scale(1.05);
+        }
+
+        .data-bar.swapping {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 30px rgba(79, 172, 254, 0.5);
+        }
+
+        .data-bar.sorted {
+            background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 4px 20px rgba(67, 233, 123, 0.4);
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 60px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-width: 700px;
+            backdrop-filter: blur(10px);
+        }
+
+        .subtitle-cn {
+            font-size: 1.6rem;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.2rem;
+            color: #6b7280;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 概念说明卡片 */
+        .concept-card {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #4b5563;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        .concept-highlight {
+            display: inline-block;
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 4px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* 算法步骤指示器 */
+        .step-indicator {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e5e7eb;
+        }
+
+        .step-dot.active {
+            background: #667eea;
+        }
+
+        /* 箭头指示 */
+        .arrow-indicator {
+            position: absolute;
+            font-size: 3rem;
+            color: #f5576c;
+            opacity: 0;
+        }
+
+        /* 完成画面 */
+        .completion-scene {
+            text-align: center;
+        }
+
+        .completion-icon {
+            font-size: 8rem;
+            margin-bottom: 40px;
+        }
+
+        .completion-title {
+            font-size: 3.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #667eea;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <h1 class="concept-title">冒泡排序 Bubble Sort</h1>
+                <p class="concept-text">
+                    冒泡排序是一种简单的排序算法，它重复地遍历要排序的列表，<br>
+                    比较相邻的两个元素，如果它们的顺序错误就把它们交换过来。<br>
+                    这个过程会持续进行，直到没有需要交换的元素为止。
+                </p>
+                <p class="concept-text" style="font-style: italic; color: #6b7280;">
+                    Bubble Sort is a simple sorting algorithm that repeatedly steps through the list,<br>
+                    compares adjacent elements and swaps them if they are in the wrong order.
+                </p>
+            </div>
+        </div>
+
+        <!-- 核心概念 -->
+        <div class="scene" id="scene-concept">
+            <div class="concept-card">
+                <h2 class="concept-title">核心思想 Core Idea</h2>
+                <p class="concept-text">
+                    每一轮遍历，最大的元素会像<span class="concept-highlight">气泡</span>一样"浮"到数组的末尾<br>
+                    就像水中的气泡会慢慢上升到水面一样
+                </p>
+                <p class="concept-text" style="font-style: italic; color: #6b7280;">
+                    In each round, the largest element "bubbles up" to the end of the array<br>
+                    Just like bubbles in water slowly rise to the surface
+                </p>
+            </div>
+        </div>
+
+        <!-- 主可视化场景 -->
+        <div class="scene" id="scene-main">
+            <div class="title-section">
+                <h1 class="main-title">排序过程 Sorting Process</h1>
+                <p class="sub-title">观察相邻元素的比较与交换</p>
+            </div>
+            
+            <div class="visualization-area" id="bars-container">
+                <!-- 动态生成的柱子 -->
+            </div>
+
+            <div class="step-indicator">
+                <div class="step-item">
+                    <div class="step-dot" id="dot-compare"></div>
+                    <span>比较 Compare</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-dot" id="dot-swap"></div>
+                    <span>交换 Swap</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-dot" id="dot-sorted"></div>
+                    <span>已排序 Sorted</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">✨</div>
+                <h1 class="completion-title">排序完成！Sorting Complete!</h1>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-rounds">0</div>
+                        <div class="stat-label">遍历轮次 Rounds</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-comparisons">0</div>
+                        <div class="stat-label">比较次数 Comparisons</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-swaps">0</div>
+                        <div class="stat-label">交换次数 Swaps</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到冒泡排序算法演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to Bubble Sort Algorithm Visualization</div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        const data = [64, 34, 25, 12, 22, 11, 90, 5];
+        const maxValue = Math.max(...data);
+        let rounds = 0;
+        let comparisons = 0;
+        let swapCount = 0;
+
+        // DOM 元素
+        const barsContainer = document.getElementById('bars-container');
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            concept: document.getElementById('scene-concept'),
+            main: document.getElementById('scene-main'),
+            complete: document.getElementById('scene-complete')
+        };
+
+        // 创建柱子
+        function createBars() {
+            data.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'data-bar';
+                bar.style.height = `${(value / maxValue) * 280 + 100}px`;
+                bar.setAttribute('data-value', value);
+                bar.setAttribute('data-index', index);
+                bar.id = `bar-${index}`;
+                barsContainer.appendChild(bar);
+            });
+        }
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 高亮步骤
+        function highlightStep(step) {
+            document.querySelectorAll('.step-dot').forEach(dot => dot.classList.remove('active'));
+            if (step) {
+                document.getElementById(`dot-${step}`).classList.add('active');
+            }
+        }
+
+        // 获取柱子
+        function getBar(index) {
+            return document.getElementById(`bar-${index}`);
+        }
+
+        // 冒泡排序动画
+        async function bubbleSort() {
+            const n = data.length;
+            
+            for (let i = 0; i < n - 1; i++) {
+                rounds++;
+                
+                updateSubtitle(
+                    `第 ${i + 1} 轮遍历开始，将第 ${n - i} 大的元素放到正确位置`,
+                    `Round ${i + 1} begins, placing the ${n - i}th largest element in position`
+                );
+                
+                await new Promise(r => setTimeout(r, 2000));
+                
+                for (let j = 0; j < n - i - 1; j++) {
+                    const bar1 = getBar(j);
+                    const bar2 = getBar(j + 1);
+                    
+                    // 比较阶段
+                    highlightStep('compare');
+                    bar1.classList.add('comparing');
+                    bar2.classList.add('comparing');
+                    comparisons++;
+                    
+                    updateSubtitle(
+                        `比较位置 ${j} 和 ${j + 1}：${data[j]} 与 ${data[j + 1]}`,
+                        `Comparing positions ${j} and ${j + 1}: ${data[j]} vs ${data[j + 1]}`
+                    );
+                    
+                    await new Promise(r => setTimeout(r, 1200));
+                    
+                    if (data[j] > data[j + 1]) {
+                        // 需要交换
+                        highlightStep('swap');
+                        bar1.classList.remove('comparing');
+                        bar2.classList.remove('comparing');
+                        bar1.classList.add('swapping');
+                        bar2.classList.add('swapping');
+                        
+                        updateSubtitle(
+                            `${data[j]} > ${data[j + 1]}，需要交换位置`,
+                            `${data[j]} > ${data[j + 1]}, swapping positions`
+                        );
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        // 执行交换
+                        const temp = data[j];
+                        data[j] = data[j + 1];
+                        data[j + 1] = temp;
+                        swapCount++;
+                        
+                        // 动画交换
+                        await new Promise(resolve => {
+                            gsap.to(bar1, {
+                                x: 102,
+                                duration: 0.4,
+                                ease: "power2.inOut"
+                            });
+                            gsap.to(bar2, {
+                                x: -102,
+                                duration: 0.4,
+                                ease: "power2.inOut",
+                                onComplete: () => {
+                                    // 更新 DOM
+                                    const parent = bar1.parentNode;
+                                    parent.insertBefore(bar2, bar1);
+                                    
+                                    // 重置位置
+                                    gsap.set([bar1, bar2], { x: 0 });
+                                    
+                                    // 更新 ID
+                                    bar1.id = `bar-${j + 1}`;
+                                    bar2.id = `bar-${j}`;
+                                    bar1.setAttribute('data-index', j + 1);
+                                    bar2.setAttribute('data-index', j);
+                                    
+                                    bar1.classList.remove('swapping');
+                                    bar2.classList.remove('swapping');
+                                    
+                                    resolve();
+                                }
+                            });
+                        });
+                        
+                        await new Promise(r => setTimeout(r, 500));
+                    } else {
+                        updateSubtitle(
+                            `${data[j]} ≤ ${data[j + 1]}，保持位置不变`,
+                            `${data[j]} ≤ ${data[j + 1]}, no swap needed`
+                        );
+                        
+                        await new Promise(r => setTimeout(r, 800));
+                        
+                        bar1.classList.remove('comparing');
+                        bar2.classList.remove('comparing');
+                    }
+                }
+                
+                // 标记已排序的元素
+                highlightStep('sorted');
+                const sortedBar = getBar(n - i - 1);
+                sortedBar.classList.add('sorted');
+                
+                updateSubtitle(
+                    `第 ${n - i} 大的元素已就位！`,
+                    `The ${n - i}th largest element is in place!`
+                );
+                
+                await new Promise(r => setTimeout(r, 1000));
+                highlightStep(null);
+            }
+            
+            // 标记第一个元素
+            getBar(0).classList.add('sorted');
+        }
+
+        // 主流程
+        async function main() {
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到概念场景
+            await switchScene(scenes.intro, scenes.concept);
+            updateSubtitle(
+                "冒泡排序的核心思想：大元素像气泡一样向上浮动",
+                "Core idea: Large elements bubble up like air bubbles in water"
+            );
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到主场景
+            await switchScene(scenes.concept, scenes.main);
+            createBars();
+            
+            // 开始排序动画
+            await bubbleSort();
+            
+            // 完成场景
+            await new Promise(r => setTimeout(r, 1000));
+            await switchScene(scenes.main, scenes.complete);
+            
+            // 更新统计数据
+            document.getElementById('total-rounds').textContent = rounds;
+            document.getElementById('total-comparisons').textContent = comparisons;
+            document.getElementById('total-swaps').textContent = swapCount;
+            
+            updateSubtitle(
+                `冒泡排序完成！共进行 ${rounds} 轮，${comparisons} 次比较，${swapCount} 次交换`,
+                `Bubble Sort complete! ${rounds} rounds, ${comparisons} comparisons, ${swapCount} swaps`
+            );
+            
+            // 庆祝动画
+            gsap.from('.stat-value', {
+                scale: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

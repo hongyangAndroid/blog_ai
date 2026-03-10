@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android的诞生 - The Birth of Android</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #1e293b;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+
+        .sub-title {
+            font-size: 1.3rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        /* 概念卡片 */
+        .concept-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 50px 70px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #475569;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        /* Android Logo */
+        .android-logo {
+            width: 200px;
+            height: 240px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .android-head {
+            width: 100px;
+            height: 50px;
+            background: #3ddc84;
+            border-radius: 50px 50px 0 0;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .android-eye {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 20px;
+        }
+
+        .android-eye.left { left: 25px; }
+        .android-eye.right { right: 25px; }
+
+        .android-antenna {
+            width: 6px;
+            height: 25px;
+            background: #3ddc84;
+            position: absolute;
+            top: -15px;
+            border-radius: 3px;
+        }
+
+        .android-antenna.left {
+            left: 25px;
+            transform: rotate(-25deg);
+        }
+
+        .android-antenna.right {
+            right: 25px;
+            transform: rotate(25deg);
+        }
+
+        .android-body {
+            width: 100px;
+            height: 90px;
+            background: #3ddc84;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .android-arm {
+            width: 25px;
+            height: 70px;
+            background: #3ddc84;
+            border-radius: 12px;
+            position: absolute;
+            top: 55px;
+        }
+
+        .android-arm.left {
+            left: 25px;
+        }
+
+        .android-arm.right {
+            right: 25px;
+        }
+
+        .android-leg {
+            width: 28px;
+            height: 60px;
+            background: #3ddc84;
+            border-radius: 0 0 14px 14px;
+            position: absolute;
+            bottom: 30px;
+        }
+
+        .android-leg.left {
+            left: 65px;
+        }
+
+        .android-leg.right {
+            right: 65px;
+        }
+
+        /* 时间线 */
+        .timeline {
+            width: 90%;
+            max-width: 1100px;
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3ddc84, #34d399, #10b981);
+            border-radius: 2px;
+        }
+
+        .timeline-events {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .timeline-event {
+            text-align: center;
+            width: 180px;
+        }
+
+        .timeline-dot {
+            width: 24px;
+            height: 24px;
+            background: #3ddc84;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(61, 220, 132, 0.4);
+        }
+
+        .timeline-year {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #3ddc84;
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* 版本展示 */
+        .versions-showcase {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+        }
+
+        .version-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .version-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .version-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .version-year {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* 统计数据 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1000px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #3ddc84;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #64748b;
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 50px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            min-width: 700px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .subtitle-cn {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 完成场景 */
+        .completion-scene {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .completion-icon {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #3ddc84, #34d399);
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 20px 60px rgba(61, 220, 132, 0.4);
+        }
+
+        .completion-title {
+            font-size: 3rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .ecosystem-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .ecosystem-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .ecosystem-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .ecosystem-desc {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <div class="android-logo">
+                    <div class="android-head">
+                        <div class="android-antenna left"></div>
+                        <div class="android-antenna right"></div>
+                        <div class="android-eye left"></div>
+                        <div class="android-eye right"></div>
+                    </div>
+                    <div class="android-body"></div>
+                    <div class="android-arm left"></div>
+                    <div class="android-arm right"></div>
+                    <div class="android-leg left"></div>
+                    <div class="android-leg right"></div>
+                </div>
+                <h1 class="concept-title">Android 的诞生</h1>
+                <p class="concept-text">
+                    从相机操作系统到全球最大的移动平台<br>
+                    Android 改变了我们与世界的连接方式
+                </p>
+                <p class="concept-text" style="font-style: italic; color: #64748b;">
+                    From a camera OS to the world's largest mobile platform<br>
+                    Android changed how we connect with the world
+                </p>
+            </div>
+        </div>
+
+        <!-- 起源故事 -->
+        <div class="scene" id="scene-origin">
+            <div class="concept-card">
+                <h2 class="concept-title">起源故事 Origin Story</h2>
+                <div style="display: flex; gap: 50px; align-items: center; justify-content: center; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">📷</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #1e293b;">最初目标</div>
+                        <div style="font-size: 1rem; color: #64748b; margin-top: 5px;">相机操作系统</div>
+                    </div>
+                    <div style="font-size: 3rem; color: #cbd5e1;">→</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">📱</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #1e293b;">战略转向</div>
+                        <div style="font-size: 1rem; color: #64748b; margin-top: 5px;">智能手机平台</div>
+                    </div>
+                    <div style="font-size: 3rem; color: #cbd5e1;">→</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">🤖</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #3ddc84;">Android Inc.</div>
+                        <div style="font-size: 1rem; color: #64748b; margin-top: 5px;">2003年成立</div>
+                    </div>
+                </div>
+                <p class="concept-text">
+                    2003年，Andy Rubin 创立 Android Inc.，最初为数码相机开发操作系统<br>
+                    2005年被 Google 收购，转向智能手机市场
+                </p>
+            </div>
+        </div>
+
+        <!-- 发展历程时间线 -->
+        <div class="scene" id="scene-timeline">
+            <div class="title-section">
+                <h1 class="main-title">发展历程 Timeline</h1>
+                <p class="sub-title">从2007年发布到全球 dominance</p>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-line"></div>
+                <div class="timeline-events">
+                    <div class="timeline-event">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-year">2003</div>
+                        <div class="timeline-title">Android Inc.</div>
+                        <div class="timeline-desc">公司成立<br>Company founded</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-year">2005</div>
+                        <div class="timeline-title">Google 收购</div>
+                        <div class="timeline-desc">被 Google 收购<br>Acquired by Google</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-year">2007</div>
+                        <div class="timeline-title">公开宣布</div>
+                        <div class="timeline-desc">OHA 联盟成立<br>Open Handset Alliance</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-year">2008</div>
+                        <div class="timeline-title">Android 1.0</div>
+                        <div class="timeline-desc">首个商业版本<br>First commercial release</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-year">今天</div>
+                        <div class="timeline-title">全球主导</div>
+                        <div class="timeline-desc">70%+ 市场份额<br>Global dominance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 版本演进 -->
+        <div class="scene" id="scene-versions">
+            <div class="title-section">
+                <h1 class="main-title">版本演进 Version Evolution</h1>
+                <p class="sub-title">从 Cupcake 到最新的 Android 版本</p>
+            </div>
+            
+            <div class="versions-showcase">
+                <div class="version-card">
+                    <div class="version-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">🧁</div>
+                    <div class="version-name">Cupcake</div>
+                    <div class="version-year">Android 1.5 (2009)</div>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon" style="background: linear-gradient(135deg, #dbeafe, #93c5fd);">🍩</div>
+                    <div class="version-name">Donut</div>
+                    <div class="version-year">Android 1.6 (2009)</div>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon" style="background: linear-gradient(135deg, #fce7f3, #f9a8d4);">🍰</div>
+                    <div class="version-name">Eclair</div>
+                    <div class="version-year">Android 2.0 (2009)</div>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon" style="background: linear-gradient(135deg, #dcfce7, #86efac);">🍦</div>
+                    <div class="version-name">Froyo</div>
+                    <div class="version-year">Android 2.2 (2010)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计数据 -->
+        <div class="scene" id="scene-stats">
+            <div class="title-section">
+                <h1 class="main-title">全球影响 Global Impact</h1>
+                <p class="sub-title">Android 改变了移动计算格局</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-devices">30亿+</div>
+                    <div class="stat-label">活跃设备 Active Devices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-share">71%</div>
+                    <div class="stat-label">市场份额 Market Share</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-apps">300万+</div>
+                    <div class="stat-label">应用数量 Apps</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-countries">190+</div>
+                    <div class="stat-label">覆盖国家 Countries</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">🤖</div>
+                <h1 class="completion-title">Android 诞生故事演示完成！</h1>
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-card">
+                        <div class="ecosystem-icon">📱</div>
+                        <div class="ecosystem-title">开放生态</div>
+                        <div class="ecosystem-desc">Open Ecosystem</div>
+                    </div>
+                    <div class="ecosystem-card">
+                        <div class="ecosystem-icon">🌍</div>
+                        <div class="ecosystem-title">全球普及</div>
+                        <div class="ecosystem-desc">Global Adoption</div>
+                    </div>
+                    <div class="ecosystem-card">
+                        <div class="ecosystem-icon">🚀</div>
+                        <div class="ecosystem-title">持续创新</div>
+                        <div class="ecosystem-desc">Continuous Innovation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到 Android 诞生故事演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to The Birth of Android Story</div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            origin: document.getElementById('scene-origin'),
+            timeline: document.getElementById('scene-timeline'),
+            versions: document.getElementById('scene-versions'),
+            stats: document.getElementById('scene-stats'),
+            complete: document.getElementById('scene-complete')
+        };
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 主流程
+        async function main() {
+            // Logo 动画
+            gsap.from('.android-logo > div', {
+                scale: 0,
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.1,
+                ease: "back.out(1.7)"
+            });
+
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到起源场景
+            await switchScene(scenes.intro, scenes.origin);
+            updateSubtitle(
+                "Android 最初是为数码相机设计的操作系统",
+                "Android was originally designed as a camera operating system"
+            );
+            
+            gsap.from('.concept-card > div > div', {
+                y: 30,
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.2
+            });
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到时间线场景
+            await switchScene(scenes.origin, scenes.timeline);
+            updateSubtitle(
+                "2003年成立，2005年被 Google 收购，2008年正式发布",
+                "Founded in 2003, acquired by Google in 2005, officially launched in 2008"
+            );
+            
+            gsap.from('.timeline-event', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.3,
+                ease: "back.out(1.7)"
+            });
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到版本场景
+            await switchScene(scenes.timeline, scenes.versions);
+            updateSubtitle(
+                "Android 版本以甜点命名，从 Cupcake 到最新的版本",
+                "Android versions were named after desserts, from Cupcake to the latest"
+            );
+            
+            gsap.from('.version-card', {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.15,
+                ease: "back.out(1.7)"
+            });
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到统计场景
+            await switchScene(scenes.versions, scenes.stats);
+            updateSubtitle(
+                "Android 已成为全球最大的移动操作系统",
+                "Android has become the world's largest mobile operating system"
+            );
+            
+            gsap.from('.stat-card', {
+                y: 40,
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.15
+            });
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 完成场景
+            await switchScene(scenes.stats, scenes.complete);
+            updateSubtitle(
+                "Android 诞生故事演示结束，开放生态改变了移动世界",
+                "The Birth of Android story complete, open ecosystem changed the mobile world"
+            );
+            
+            // 庆祝动画
+            gsap.from('.ecosystem-card', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

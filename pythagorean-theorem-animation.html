@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勾股定理 - Pythagorean Theorem</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fafbfc 0%, #f0f4f8 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 300;
+            color: #1a1a2e;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .sub-title {
+            font-size: 1.5rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* 概念卡片 */
+        .concept-card {
+            background: white;
+            padding: 50px 70px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #4b5563;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        .formula-box {
+            display: inline-block;
+            background: linear-gradient(120deg, #e0f2fe 0%, #fce7f3 100%);
+            padding: 30px 60px;
+            border-radius: 20px;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 30px 0;
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* 主可视化区域 */
+        .visualization-area {
+            width: 90%;
+            max-width: 1200px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 几何图形区域 */
+        .geometry-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+        }
+
+        /* 直角三角形 */
+        .triangle-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .triangle-path {
+            fill: rgba(99, 102, 241, 0.2);
+            stroke: #6366f1;
+            stroke-width: 4;
+            stroke-linejoin: round;
+        }
+
+        .triangle-side {
+            stroke: #4b5563;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .side-label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            fill: #1a1a2e;
+        }
+
+        .right-angle-mark {
+            stroke: #10b981;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* 正方形区域 */
+        .squares-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .area-square {
+            position: absolute;
+            border: 3px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            opacity: 0;
+        }
+
+        .square-a {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .square-b {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .square-c {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        /* 水波填充效果 */
+        .water-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            opacity: 0.6;
+            transition: height 1s ease;
+        }
+
+        .water-fill.a { background: #f59e0b; }
+        .water-fill.b { background: #3b82f6; }
+        .water-fill.c { background: #10b981; }
+
+        /* 数值显示 */
+        .value-display {
+            position: absolute;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1.3rem;
+            font-weight: 600;
+            opacity: 0;
+        }
+
+        /* 证明图示 */
+        .proof-container {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .proof-box {
+            width: 350px;
+            height: 350px;
+            border: 3px solid #e5e7eb;
+            border-radius: 16px;
+            position: relative;
+            background: white;
+            overflow: hidden;
+        }
+
+        .proof-label {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 60px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-width: 700px;
+            backdrop-filter: blur(10px);
+        }
+
+        .subtitle-cn {
+            font-size: 1.6rem;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.2rem;
+            color: #6b7280;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 完成场景 */
+        .completion-scene {
+            text-align: center;
+        }
+
+        .completion-icon {
+            font-size: 8rem;
+            margin-bottom: 40px;
+        }
+
+        .completion-title {
+            font-size: 3.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .app-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .app-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .app-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .app-desc {
+            font-size: 0.95rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <h1 class="concept-title">勾股定理 Pythagorean Theorem</h1>
+                <p class="concept-text">
+                    直角三角形中，两条直角边的平方和等于斜边的平方<br>
+                    这是几何学中最重要、最基本的定理之一
+                </p>
+                <div class="formula-box">
+                    a² + b² = c²
+                </div>
+                <p class="concept-text" style="font-style: italic; color: #6b7280;">
+                    In a right triangle, the square of the hypotenuse equals<br>
+                    the sum of squares of the other two sides
+                </p>
+            </div>
+        </div>
+
+        <!-- 核心概念 -->
+        <div class="scene" id="scene-concept">
+            <div class="concept-card">
+                <h2 class="concept-title">定理内容 The Theorem</h2>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 50px; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <div style="width: 200px; height: 150px; position: relative; margin: 0 auto 20px;">
+                            <svg width="200" height="150" viewBox="0 0 200 150">
+                                <polygon points="30,120 30,30 170,120" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="3"/>
+                                <rect x="30" y="105" width="15" height="15" fill="none" stroke="#10b981" stroke-width="2"/>
+                                <text x="10" y="80" fill="#f59e0b" font-size="20" font-weight="bold">a</text>
+                                <text x="90" y="145" fill="#3b82f6" font-size="20" font-weight="bold">b</text>
+                                <text x="110" y="70" fill="#10b981" font-size="20" font-weight="bold">c</text>
+                            </svg>
+                        </div>
+                        <div style="font-size: 1.1rem; color: #4b5563;">直角三角形 Right Triangle</div>
+                    </div>
+                    <div style="font-size: 2rem; color: #9ca3af;">→</div>
+                    <div style="background: linear-gradient(120deg, #fef3c7, #dbeafe); padding: 30px 40px; border-radius: 16px;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #1a1a2e; font-family: 'Times New Roman', serif;">a² + b² = c²</div>
+                    </div>
+                </div>
+                <p class="concept-text">
+                    <span style="color: #f59e0b; font-weight: 600;">a</span> 和 <span style="color: #3b82f6; font-weight: 600;">b</span> 是直角边（股），<span style="color: #10b981; font-weight: 600;">c</span> 是斜边（弦）<br>
+                    中国古代称短直角边为"勾"，长直角边为"股"，斜边为"弦"
+                </p>
+            </div>
+        </div>
+
+        <!-- 主可视化场景 - 面积证明 -->
+        <div class="scene" id="scene-main">
+            <div class="title-section">
+                <h1 class="main-title">面积法证明 Proof by Areas</h1>
+                <p class="sub-title">以三边为边长的正方形，面积关系揭示定理本质</p>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="geometry-container">
+                    <!-- 直角三角形 -->
+                    <svg class="triangle-svg" width="600" height="450" viewBox="0 0 600 450">
+                        <!-- 三角形 -->
+                        <polygon class="triangle-path" points="100,350 100,100 450,350"/>
+                        
+                        <!-- 直角标记 -->
+                        <rect class="right-angle-mark" x="100" y="320" width="30" height="30"/>
+                        
+                        <!-- 边标注 -->
+                        <text class="side-label" x="60" y="230">a = 3</text>
+                        <text class="side-label" x="260" y="390">b = 4</text>
+                        <text class="side-label" x="320" y="200">c = 5</text>
+                    </svg>
+
+                    <!-- 正方形A（黄色）-->
+                    <div class="area-square square-a" id="square-a" style="left: 50px; top: 50px; width: 90px; height: 90px;">
+                        <div class="water-fill a" id="water-a"></div>
+                        <span>a² = 9</span>
+                    </div>
+
+                    <!-- 正方形B（蓝色）-->
+                    <div class="area-square square-b" id="square-b" style="right: 100px; bottom: 50px; width: 120px; height: 120px;">
+                        <div class="water-fill b" id="water-b"></div>
+                        <span>b² = 16</span>
+                    </div>
+
+                    <!-- 正方形C（绿色）-->
+                    <div class="area-square square-c" id="square-c" style="right: 80px; top: 80px; width: 150px; height: 150px;">
+                        <div class="water-fill c" id="water-c"></div>
+                        <span>c² = 25</span>
+                    </div>
+
+                    <!-- 数值显示 -->
+                    <div class="value-display" id="value-a" style="left: 20px; top: 150px;">a² = 3² = 9</div>
+                    <div class="value-display" id="value-b" style="right: 20px; bottom: 180px;">b² = 4² = 16</div>
+                    <div class="value-display" id="value-c" style="right: 50px; top: 20px;">c² = 5² = 25</div>
+                    <div class="value-display" id="value-sum" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: linear-gradient(120deg, #fef3c7, #dbeafe); font-size: 1.5rem;">9 + 16 = 25 ✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">📐</div>
+                <h1 class="completion-title">勾股定理演示完成！</h1>
+                <div class="formula-box">
+                    a² + b² = c²
+                </div>
+                <div class="applications-grid">
+                    <div class="app-card">
+                        <div class="app-icon">🏗️</div>
+                        <div class="app-title">建筑工程</div>
+                        <div class="app-desc">测量距离、确保直角</div>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-icon">🧭</div>
+                        <div class="app-title">导航定位</div>
+                        <div class="app-desc">GPS 距离计算</div>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-icon">📱</div>
+                        <div class="app-title">计算机图形</div>
+                        <div class="app-desc">计算像素距离</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到勾股定理演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to Pythagorean Theorem Demonstration</div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            concept: document.getElementById('scene-concept'),
+            main: document.getElementById('scene-main'),
+            complete: document.getElementById('scene-complete')
+        };
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 面积证明动画
+        async function areaProofAnimation() {
+            const squareA = document.getElementById('square-a');
+            const squareB = document.getElementById('square-b');
+            const squareC = document.getElementById('square-c');
+            const waterA = document.getElementById('water-a');
+            const waterB = document.getElementById('water-b');
+            const waterC = document.getElementById('water-c');
+            const valueA = document.getElementById('value-a');
+            const valueB = document.getElementById('value-b');
+            const valueC = document.getElementById('value-c');
+            const valueSum = document.getElementById('value-sum');
+
+            // 显示正方形A
+            updateSubtitle(
+                '以直角边 a 为边长的正方形，面积 = a² = 3² = 9',
+                'Square with side a, area = a² = 3² = 9'
+            );
+            gsap.to(squareA, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" });
+            await new Promise(r => setTimeout(r, 500));
+            waterA.style.height = '100%';
+            gsap.to(valueA, { opacity: 1, x: 0, duration: 0.5 });
+            await new Promise(r => setTimeout(r, 2000));
+
+            // 显示正方形B
+            updateSubtitle(
+                '以直角边 b 为边长的正方形，面积 = b² = 4² = 16',
+                'Square with side b, area = b² = 4² = 16'
+            );
+            gsap.to(squareB, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" });
+            await new Promise(r => setTimeout(r, 500));
+            waterB.style.height = '100%';
+            gsap.to(valueB, { opacity: 1, x: 0, duration: 0.5 });
+            await new Promise(r => setTimeout(r, 2000));
+
+            // 显示正方形C
+            updateSubtitle(
+                '以斜边 c 为边长的正方形，面积 = c² = 5² = 25',
+                'Square with hypotenuse c, area = c² = 5² = 25'
+            );
+            gsap.to(squareC, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" });
+            await new Promise(r => setTimeout(r, 500));
+            waterC.style.height = '100%';
+            gsap.to(valueC, { opacity: 1, x: 0, duration: 0.5 });
+            await new Promise(r => setTimeout(r, 2000));
+
+            // 显示等式
+            updateSubtitle(
+                'a² + b² = c²，即 9 + 16 = 25，定理得证！',
+                'a² + b² = c², that is 9 + 16 = 25, theorem proved!'
+            );
+            gsap.to(valueSum, { 
+                opacity: 1, 
+                scale: 1.1, 
+                duration: 0.6, 
+                ease: "back.out(1.7)",
+                yoyo: true,
+                repeat: 1
+            });
+            
+            // 高亮所有正方形
+            gsap.to([squareA, squareB, squareC], {
+                boxShadow: '0 0 30px rgba(0,0,0,0.2)',
+                duration: 0.5,
+                yoyo: true,
+                repeat: 1
+            });
+            
+            await new Promise(r => setTimeout(r, 3000));
+        }
+
+        // 主流程
+        async function main() {
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到概念场景
+            await switchScene(scenes.intro, scenes.concept);
+            updateSubtitle(
+                "勾股定理：直角三角形两直角边的平方和等于斜边的平方",
+                "Pythagorean Theorem: sum of squares of legs equals square of hypotenuse"
+            );
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到主场景
+            await switchScene(scenes.concept, scenes.main);
+            
+            // 开始面积证明动画
+            await areaProofAnimation();
+            
+            // 完成场景
+            await new Promise(r => setTimeout(r, 1000));
+            await switchScene(scenes.main, scenes.complete);
+            
+            updateSubtitle(
+                "勾股定理演示结束，这一定理在工程、导航、计算机等领域有广泛应用",
+                "Pythagorean Theorem demonstration complete, widely used in engineering, navigation, computing"
+            );
+            
+            // 庆祝动画
+            gsap.from('.app-card', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

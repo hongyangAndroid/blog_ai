@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双缝干涉实验 - Double-Slit Experiment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: white;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+
+        .sub-title {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* 概念卡片 */
+        .concept-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 50px 70px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1000px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #cbd5e1;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        /* 主可视化区域 */
+        .visualization-area {
+            width: 90%;
+            max-width: 1200px;
+            height: 600px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 实验装置 */
+        .experiment-setup {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+        }
+
+        /* 光源 */
+        .light-source {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #fef3c7, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            box-shadow: 0 0 60px #fbbf24, 0 0 100px rgba(251, 191, 36, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        .light-source::before {
+            content: '光源\nSource';
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            white-space: pre;
+        }
+
+        /* 双缝挡板 */
+        .barrier {
+            width: 20px;
+            height: 400px;
+            background: linear-gradient(180deg, #475569 0%, #64748b 50%, #475569 100%);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .slit {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #0f172a;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .slit.top {
+            top: 100px;
+        }
+
+        .slit.bottom {
+            bottom: 100px;
+        }
+
+        .barrier-label {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #94a3b8;
+            white-space: pre;
+            text-align: center;
+        }
+
+        /* 屏幕 */
+        .screen {
+            width: 30px;
+            height: 500px;
+            background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .screen-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+        }
+
+        .interference-band {
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent 0%, #fbbf24 50%, transparent 100%);
+            opacity: 0.8;
+        }
+
+        .screen-label {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #94a3b8;
+            white-space: pre;
+            text-align: center;
+        }
+
+        /* 光波 */
+        .wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .wave {
+            position: absolute;
+            border: 2px solid rgba(251, 191, 36, 0.6);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .wave.from-slit1 {
+            top: 180px;
+        }
+
+        .wave.from-slit2 {
+            bottom: 180px;
+        }
+
+        /* 粒子效果 */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fbbf24;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fbbf24;
+            opacity: 0;
+        }
+
+        /* 波粒二象性展示 */
+        .duality-container {
+            display: flex;
+            gap: 80px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .duality-box {
+            width: 400px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .duality-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .wave-pattern-preview {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(180deg, 
+                transparent 0%,
+                rgba(251, 191, 36, 0.3) 10%,
+                transparent 20%,
+                rgba(251, 191, 36, 0.5) 30%,
+                transparent 40%,
+                rgba(251, 191, 36, 0.8) 50%,
+                transparent 60%,
+                rgba(251, 191, 36, 0.5) 70%,
+                transparent 80%,
+                rgba(251, 191, 36, 0.3) 90%,
+                transparent 100%
+            );
+            border-radius: 10px;
+            opacity: 0;
+        }
+
+        .particle-pattern-preview {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            border-radius: 10px;
+        }
+
+        .particle-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fbbf24;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px 50px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            min-width: 700px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .subtitle-cn {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 完成场景 */
+        .completion-scene {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .completion-icon {
+            font-size: 7rem;
+            margin-bottom: 30px;
+        }
+
+        .completion-title {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .implications-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .implication-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .implication-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .implication-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .implication-desc {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <h1 class="concept-title">⚛️ 双缝干涉实验</h1>
+                <p class="concept-text">
+                    物理学中最著名的实验之一，揭示了光的波动性和粒子性<br>
+                    当光通过两条狭缝时，会产生干涉条纹，展现波的特性
+                </p>
+                <p class="concept-text" style="font-style: italic; color: #94a3b8;">
+                    One of the most famous experiments in physics, revealing the wave-particle duality of light<br>
+                    When light passes through two slits, interference patterns emerge, showing wave properties
+                </p>
+            </div>
+        </div>
+
+        <!-- 核心概念 -->
+        <div class="scene" id="scene-concept">
+            <div class="concept-card">
+                <h2 class="concept-title">波粒二象性 Wave-Particle Duality</h2>
+                <div style="display: flex; gap: 60px; justify-content: center; align-items: center; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">〰️</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #22c55e;">波动性 Wave</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">干涉、衍射</div>
+                    </div>
+                    <div style="font-size: 2rem; color: #475569;">+</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">•</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #fbbf24;">粒子性 Particle</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">离散能量包</div>
+                    </div>
+                    <div style="font-size: 2rem; color: #475569;">=</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">⚛️</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #3b82f6;">量子力学</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">Quantum Mechanics</div>
+                    </div>
+                </div>
+                <p class="concept-text">
+                    光既表现出波动性（干涉条纹），又表现出粒子性（光子）<br>
+                    双缝实验完美展示了这种波粒二象性
+                </p>
+            </div>
+        </div>
+
+        <!-- 主可视化场景 - 实验装置 -->
+        <div class="scene" id="scene-experiment">
+            <div class="title-section">
+                <h1 class="main-title">实验装置 Experimental Setup</h1>
+                <p class="sub-title">光源 → 双缝挡板 → 屏幕</p>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="experiment-setup">
+                    <!-- 光源 -->
+                    <div class="light-source" id="light-source"></div>
+                    
+                    <!-- 双缝挡板 -->
+                    <div class="barrier">
+                        <div class="slit top"></div>
+                        <div class="slit bottom"></div>
+                        <div class="barrier-label">双缝\nDouble Slits</div>
+                    </div>
+                    
+                    <!-- 屏幕 -->
+                    <div class="screen" id="screen">
+                        <div class="screen-pattern" id="screen-pattern">
+                            <!-- 干涉条纹将通过JS生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 光波 -->
+                    <div class="wave-container" id="wave-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 波粒二象性对比 -->
+        <div class="scene" id="scene-duality">
+            <div class="title-section">
+                <h1 class="main-title">波粒二象性对比 Wave vs Particle</h1>
+                <p class="sub-title">单次发射粒子累积形成干涉条纹</p>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="duality-container">
+                    <div class="duality-box">
+                        <div class="duality-title" style="color: #22c55e;">波动模式 Wave Pattern</div>
+                        <div class="wave-pattern-preview" id="wave-pattern"></div>
+                    </div>
+                    <div class="duality-box">
+                        <div class="duality-title" style="color: #fbbf24;">粒子累积 Particle Buildup</div>
+                        <div class="particle-pattern-preview" id="particle-pattern"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">⚛️</div>
+                <h1 class="completion-title">双缝干涉实验演示完成！</h1>
+                <div class="implications-grid">
+                    <div class="implication-card">
+                        <div class="implication-icon">🔬</div>
+                        <div class="implication-title">量子力学基础</div>
+                        <div class="implication-desc">Foundation of Quantum Mechanics</div>
+                    </div>
+                    <div class="implication-card">
+                        <div class="implication-icon">🌊</div>
+                        <div class="implication-title">波粒二象性</div>
+                        <div class="implication-desc">Wave-Particle Duality</div>
+                    </div>
+                    <div class="implication-card">
+                        <div class="implication-icon">🎯</div>
+                        <div class="implication-title">概率幅叠加</div>
+                        <div class="implication-desc">Probability Amplitude</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到双缝干涉实验演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to Double-Slit Experiment Demonstration</div>
+        </div>
+    </div>
+
+    <script>
+        // 生成光波
+        function createWaves() {
+            const container = document.getElementById('wave-container');
+            
+            // 从缝1发出的波
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const wave = document.createElement('div');
+                    wave.className = 'wave from-slit1';
+                    wave.style.left = '380px';
+                    wave.style.top = '180px';
+                    wave.style.width = '20px';
+                    wave.style.height = '20px';
+                    container.appendChild(wave);
+                    
+                    gsap.to(wave, {
+                        width: 400,
+                        height: 200,
+                        opacity: 0,
+                        left: 480,
+                        top: 130,
+                        duration: 2,
+                        ease: "power1.out",
+                        onComplete: () => wave.remove()
+                    });
+                }, i * 400);
+            }
+            
+            // 从缝2发出的波
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const wave = document.createElement('div');
+                    wave.className = 'wave from-slit2';
+                    wave.style.left = '380px';
+                    wave.style.bottom = '180px';
+                    wave.style.width = '20px';
+                    wave.style.height = '20px';
+                    container.appendChild(wave);
+                    
+                    gsap.to(wave, {
+                        width: 400,
+                        height: 200,
+                        opacity: 0,
+                        left: 480,
+                        bottom: 130,
+                        duration: 2,
+                        ease: "power1.out",
+                        onComplete: () => wave.remove()
+                    });
+                }, i * 400 + 200);
+            }
+        }
+
+        // 生成干涉条纹
+        function createInterferencePattern() {
+            const screen = document.getElementById('screen-pattern');
+            const positions = [15, 30, 50, 70, 85]; // 亮纹位置
+            
+            positions.forEach((pos, i) => {
+                const band = document.createElement('div');
+                band.className = 'interference-band';
+                band.style.top = pos + '%';
+                band.style.height = (i === 2 ? 12 : 8) + 'px';
+                band.style.opacity = i === 2 ? 1 : 0.6;
+                screen.appendChild(band);
+            });
+        }
+
+        // 生成粒子点
+        function createParticleDots() {
+            const container = document.getElementById('particle-pattern');
+            const positions = [
+                {x: 50, y: 50}, {x: 80, y: 80}, {x: 120, y: 45},
+                {x: 150, y: 90}, {x: 200, y: 50}, {x: 250, y: 85},
+                {x: 300, y: 48}, {x: 100, y: 120}, {x: 180, y: 140},
+                {x: 260, y: 130}, {x: 320, y: 150}, {x: 140, y: 180},
+                {x: 220, y: 200}, {x: 280, y: 190}
+            ];
+            
+            positions.forEach((pos, i) => {
+                setTimeout(() => {
+                    const dot = document.createElement('div');
+                    dot.className = 'particle-dot';
+                    dot.style.left = pos.x + 'px';
+                    dot.style.top = pos.y + 'px';
+                    container.appendChild(dot);
+                    
+                    gsap.to(dot, {
+                        opacity: 0.8,
+                        scale: 1.5,
+                        duration: 0.3,
+                        ease: "back.out(1.7)"
+                    });
+                }, i * 100);
+            });
+        }
+
+        // DOM 元素
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            concept: document.getElementById('scene-concept'),
+            experiment: document.getElementById('scene-experiment'),
+            duality: document.getElementById('scene-duality'),
+            complete: document.getElementById('scene-complete')
+        };
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+        const screenPattern = document.getElementById('screen-pattern');
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 实验动画
+        async function experimentAnimation() {
+            updateSubtitle(
+                '光从光源发出，通过两条狭缝',
+                'Light emits from source, passes through two slits'
+            );
+            
+            await new Promise(r => setTimeout(r, 2000));
+            
+            // 发光动画
+            gsap.to('#light-source', {
+                boxShadow: '0 0 100px #fbbf24, 0 0 150px rgba(251, 191, 36, 0.8)',
+                duration: 0.5,
+                yoyo: true,
+                repeat: 3
+            });
+            
+            await new Promise(r => setTimeout(r, 1000));
+            
+            updateSubtitle(
+                '光波从两个缝发出，相互干涉',
+                'Waves emit from both slits and interfere with each other'
+            );
+            
+            // 光波动画
+            createWaves();
+            
+            await new Promise(r => setTimeout(r, 3000));
+            
+            updateSubtitle(
+                '在屏幕上形成干涉条纹 - 明暗相间的图案',
+                'Interference pattern forms on screen - alternating bright and dark bands'
+            );
+            
+            // 显示干涉条纹
+            createInterferencePattern();
+            gsap.to(screenPattern, {
+                opacity: 1,
+                duration: 1.5,
+                ease: "power2.out"
+            });
+            
+            await new Promise(r => setTimeout(r, 3000));
+        }
+
+        // 主流程
+        async function main() {
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到概念场景
+            await switchScene(scenes.intro, scenes.concept);
+            updateSubtitle(
+                "光具有波粒二象性，既是波又是粒子",
+                "Light has wave-particle duality, both wave and particle"
+            );
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到实验场景
+            await switchScene(scenes.concept, scenes.experiment);
+            await experimentAnimation();
+            
+            // 切换到波粒二象性场景
+            await switchScene(scenes.experiment, scenes.duality);
+            updateSubtitle(
+                "单个粒子累积后，仍然形成干涉条纹",
+                "Individual particles accumulate to form interference pattern"
+            );
+            
+            // 显示波模式和粒子累积
+            gsap.to('#wave-pattern', {
+                opacity: 1,
+                duration: 1
+            });
+            
+            await new Promise(r => setTimeout(r, 1500));
+            createParticleDots();
+            
+            await new Promise(r => setTimeout(r, 3000));
+            
+            // 完成场景
+            await switchScene(scenes.duality, scenes.complete);
+            updateSubtitle(
+                "双缝干涉实验演示结束，这是量子力学的基石之一",
+                "Double-slit experiment complete, a cornerstone of quantum mechanics"
+            );
+            
+            // 庆祝动画
+            gsap.from('.implication-card', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

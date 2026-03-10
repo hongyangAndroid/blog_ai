@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酸碱中和反应 - Acid-Base Neutralization Reaction</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fafbfc 0%, #f0f4f8 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 300;
+            color: #1a1a2e;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .sub-title {
+            font-size: 1.5rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        /* 概念卡片 */
+        .concept-card {
+            background: white;
+            padding: 50px 70px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #4b5563;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        .formula-box {
+            display: inline-block;
+            background: linear-gradient(120deg, #e0f2fe 0%, #fce7f3 100%);
+            padding: 20px 40px;
+            border-radius: 16px;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 20px 0;
+        }
+
+        /* 主可视化区域 */
+        .visualization-area {
+            width: 90%;
+            max-width: 1400px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 烧杯 */
+        .beaker-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+        }
+
+        .beaker {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.3) 100%);
+            overflow: hidden;
+        }
+
+        .beaker::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            height: 20px;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            transition: height 1s ease;
+        }
+
+        .liquid.acid {
+            background: linear-gradient(180deg, #fef3c7 0%, #fbbf24 100%);
+        }
+
+        .liquid.base {
+            background: linear-gradient(180deg, #dbeafe 0%, #3b82f6 100%);
+        }
+
+        .liquid.neutral {
+            background: linear-gradient(180deg, #d1fae5 0%, #10b981 100%);
+        }
+
+        .liquid-surface {
+            position: absolute;
+            top: -10px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: inherit;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* pH 指示剂 */
+        .ph-scale {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 400px;
+            background: linear-gradient(180deg, 
+                #ef4444 0%,    /* pH 0-3 强酸 */
+                #f97316 15%,   /* pH 4-6 弱酸 */
+                #eab308 30%,   /* pH 7 中性 */
+                #22c55e 50%,   /* pH 8-10 弱碱 */
+                #3b82f6 75%,   /* pH 11-14 强碱 */
+                #6366f1 100%
+            );
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .ph-indicator {
+            position: absolute;
+            left: -15px;
+            width: 90px;
+            height: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            transition: top 0.5s ease;
+        }
+
+        .ph-labels {
+            position: absolute;
+            right: 140px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        /* 分子 */
+        .molecule-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .molecule {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .molecule.h-plus {
+            width: 40px;
+            height: 40px;
+            background: #fbbf24;
+        }
+
+        .molecule.oh-minus {
+            width: 50px;
+            height: 50px;
+            background: #3b82f6;
+        }
+
+        .molecule.water {
+            width: 45px;
+            height: 45px;
+            background: #10b981;
+        }
+
+        /* 滴管 */
+        .dropper {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 150px;
+        }
+
+        .dropper-body {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+        }
+
+        .dropper-tip {
+            width: 20px;
+            height: 50px;
+            background: linear-gradient(90deg, #d1d5db 0%, #e5e7eb 50%, #d1d5db 100%);
+            margin: 0 auto;
+            clip-path: polygon(0 0, 100% 0, 60% 100%, 40% 100%);
+        }
+
+        .drop {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 30px;
+            background: #3b82f6;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0;
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 60px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            min-width: 700px;
+            backdrop-filter: blur(10px);
+        }
+
+        .subtitle-cn {
+            font-size: 1.6rem;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.2rem;
+            color: #6b7280;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 完成场景 */
+        .completion-scene {
+            text-align: center;
+        }
+
+        .completion-icon {
+            font-size: 8rem;
+            margin-bottom: 40px;
+        }
+
+        .completion-title {
+            font-size: 3.5rem;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .key-points {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .key-point {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .key-point-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .key-point-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .key-point-desc {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        /* 反应方程式 */
+        .equation-display {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 30px 0;
+            padding: 30px 50px;
+            background: linear-gradient(120deg, #fef3c7 0%, #dbeafe 50%, #d1fae5 100%);
+            border-radius: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <h1 class="concept-title">酸碱中和反应 Acid-Base Neutralization</h1>
+                <p class="concept-text">
+                    酸和碱反应生成盐和水的化学反应<br>
+                    本质是氢离子(H⁺)与氢氧根离子(OH⁻)结合生成水(H₂O)
+                </p>
+                <div class="equation-display">
+                    H⁺ + OH⁻ → H₂O
+                </div>
+                <p class="concept-text" style="font-style: italic; color: #6b7280;">
+                    A chemical reaction where an acid and a base react to form salt and water<br>
+                    The essence is hydrogen ions combining with hydroxide ions to form water
+                </p>
+            </div>
+        </div>
+
+        <!-- 核心概念 -->
+        <div class="scene" id="scene-concept">
+            <div class="concept-card">
+                <h2 class="concept-title">反应本质 The Essence of Reaction</h2>
+                <div style="display: flex; gap: 60px; justify-content: center; align-items: center; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">🍋</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #f59e0b;">酸 Acid</div>
+                        <div style="font-size: 1rem; color: #6b7280; margin-top: 8px;">含 H⁺ 离子</div>
+                    </div>
+                    <div style="font-size: 3rem; color: #9ca3af;">+</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">🧼</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #3b82f6;">碱 Base</div>
+                        <div style="font-size: 1rem; color: #6b7280; margin-top: 8px;">含 OH⁻ 离子</div>
+                    </div>
+                    <div style="font-size: 3rem; color: #9ca3af;">=</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 15px;">💧</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #10b981;">水 Water</div>
+                        <div style="font-size: 1rem; color: #6b7280; margin-top: 8px;">H₂O</div>
+                    </div>
+                </div>
+                <p class="concept-text">
+                    当酸溶液中的<span style="color: #f59e0b; font-weight: 600;">H⁺离子</span>与碱溶液中的<span style="color: #3b82f6; font-weight: 600;">OH⁻离子</span>相遇时<br>
+                    它们会结合形成<span style="color: #10b981; font-weight: 600;">水分子</span>，同时释放热量
+                </p>
+            </div>
+        </div>
+
+        <!-- 主可视化场景 -->
+        <div class="scene" id="scene-main">
+            <div class="title-section">
+                <h1 class="main-title">中和反应过程 Neutralization Process</h1>
+                <p class="sub-title">观察 pH 值变化与离子反应</p>
+            </div>
+            
+            <div class="visualization-area">
+                <!-- pH 刻度 -->
+                <div class="ph-scale">
+                    <div class="ph-indicator" id="ph-indicator" style="top: 10%;">pH 1</div>
+                </div>
+                <div class="ph-labels">
+                    <span>酸性 Acidic</span>
+                    <span>中性 Neutral</span>
+                    <span>碱性 Basic</span>
+                </div>
+
+                <!-- 烧杯 -->
+                <div class="beaker-container">
+                    <div class="dropper" id="dropper">
+                        <div class="dropper-body"></div>
+                        <div class="dropper-tip"></div>
+                        <div class="drop" id="drop"></div>
+                    </div>
+                    <div class="beaker">
+                        <div class="liquid acid" id="main-liquid">
+                            <div class="liquid-surface"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分子容器 -->
+                <div class="molecule-container" id="molecule-container"></div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">⚗️</div>
+                <h1 class="completion-title">反应完成！Reaction Complete!</h1>
+                <div class="equation-display">
+                    HCl + NaOH → NaCl + H₂O
+                </div>
+                <div class="key-points">
+                    <div class="key-point">
+                        <div class="key-point-icon">🧪</div>
+                        <div class="key-point-title">生成盐 Salt Formed</div>
+                        <div class="key-point-desc">氯化钠 NaCl</div>
+                    </div>
+                    <div class="key-point">
+                        <div class="key-point-icon">💧</div>
+                        <div class="key-point-title">生成水 Water Formed</div>
+                        <div class="key-point-desc">H₂O</div>
+                    </div>
+                    <div class="key-point">
+                        <div class="key-point-icon">⚖️</div>
+                        <div class="key-point-title">pH 中性 Neutral pH</div>
+                        <div class="key-point-desc">pH = 7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到酸碱中和反应演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to Acid-Base Neutralization Demonstration</div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            concept: document.getElementById('scene-concept'),
+            main: document.getElementById('scene-main'),
+            complete: document.getElementById('scene-complete')
+        };
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+        const mainLiquid = document.getElementById('main-liquid');
+        const phIndicator = document.getElementById('ph-indicator');
+        const dropper = document.getElementById('dropper');
+        const drop = document.getElementById('drop');
+        const moleculeContainer = document.getElementById('molecule-container');
+
+        let currentPH = 1;
+        let molecules = [];
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 创建分子
+        function createMolecule(type, x, y) {
+            const molecule = document.createElement('div');
+            molecule.className = `molecule ${type}`;
+            molecule.style.left = x + 'px';
+            molecule.style.top = y + 'px';
+            molecule.textContent = type === 'h-plus' ? 'H⁺' : type === 'oh-minus' ? 'OH⁻' : 'H₂O';
+            moleculeContainer.appendChild(molecule);
+            return molecule;
+        }
+
+        // 更新 pH 指示器
+        function updatePH(ph) {
+            currentPH = ph;
+            const percent = 100 - ((ph / 14) * 100);
+            phIndicator.style.top = percent + '%';
+            phIndicator.textContent = `pH ${ph}`;
+            
+            // 根据 pH 改变颜色
+            if (ph < 7) {
+                phIndicator.style.color = '#f59e0b';
+            } else if (ph === 7) {
+                phIndicator.style.color = '#10b981';
+            } else {
+                phIndicator.style.color = '#3b82f6';
+            }
+        }
+
+        // 中和反应动画
+        async function neutralizationAnimation() {
+            // 初始状态：酸性溶液
+            gsap.to(mainLiquid, { height: '40%', duration: 1 });
+            updatePH(1);
+            
+            updateSubtitle(
+                '初始状态：烧杯中是强酸性溶液，pH = 1',
+                'Initial state: Strong acid solution in beaker, pH = 1'
+            );
+            
+            await new Promise(r => setTimeout(r, 2500));
+            
+            // 添加 H+ 离子
+            for (let i = 0; i < 8; i++) {
+                const x = 100 + Math.random() * 200;
+                const y = 200 + Math.random() * 150;
+                const mol = createMolecule('h-plus', x, y);
+                molecules.push({ el: mol, type: 'h-plus', x, y });
+                gsap.from(mol, { scale: 0, duration: 0.3 });
+            }
+            
+            updateSubtitle(
+                '酸溶液中含有大量的氢离子 H⁺',
+                'Acid solution contains abundant hydrogen ions H⁺'
+            );
+            
+            await new Promise(r => setTimeout(r, 2000));
+            
+            // 滴管下降
+            updateSubtitle(
+                '现在开始逐滴加入碱性溶液',
+                'Now adding basic solution drop by drop'
+            );
+            
+            gsap.to(dropper, { top: '20px', duration: 1 });
+            await new Promise(r => setTimeout(r, 1500));
+            
+            // 滴加过程
+            const drops = 7;
+            for (let i = 0; i < drops; i++) {
+                // 液滴出现
+                gsap.set(drop, { opacity: 1, y: 0 });
+                
+                // 液滴下落
+                await new Promise(resolve => {
+                    gsap.to(drop, {
+                        y: 200,
+                        duration: 0.8,
+                        ease: "power2.in",
+                        onComplete: resolve
+                    });
+                });
+                
+                // 液滴消失，液面上升
+                gsap.set(drop, { opacity: 0, y: 0 });
+                const newHeight = 40 + ((i + 1) / drops) * 35;
+                gsap.to(mainLiquid, { height: newHeight + '%', duration: 0.5 });
+                
+                // 添加 OH- 离子
+                const x = 100 + Math.random() * 200;
+                const y = 150 + Math.random() * 100;
+                const mol = createMolecule('oh-minus', x, y);
+                molecules.push({ el: mol, type: 'oh-minus', x, y });
+                gsap.from(mol, { scale: 0, duration: 0.3 });
+                
+                // pH 变化
+                const newPH = 1 + ((i + 1) / drops) * 6;
+                updatePH(Math.round(newPH));
+                
+                updateSubtitle(
+                    `加入碱液，pH 上升至 ${Math.round(newPH)}`,
+                    `Adding base, pH rising to ${Math.round(newPH)}`
+                );
+                
+                await new Promise(r => setTimeout(r, 800));
+            }
+            
+            // 离子反应
+            updateSubtitle(
+                'H⁺ 离子与 OH⁻ 离子开始结合生成水分子',
+                'H⁺ and OH⁻ ions begin combining to form water molecules'
+            );
+            
+            // 找到配对的离子并反应
+            const hIons = molecules.filter(m => m.type === 'h-plus');
+            const ohIons = molecules.filter(m => m.type === 'oh-minus');
+            
+            for (let i = 0; i < Math.min(hIons.length, ohIons.length); i++) {
+                const h = hIons[i];
+                const oh = ohIons[i];
+                
+                // 移动到一起
+                await new Promise(resolve => {
+                    gsap.to(h.el, {
+                        x: 150,
+                        y: 250,
+                        duration: 0.8,
+                        ease: "power2.inOut"
+                    });
+                    gsap.to(oh.el, {
+                        x: 150,
+                        y: 250,
+                        duration: 0.8,
+                        ease: "power2.inOut",
+                        onComplete: resolve
+                    });
+                });
+                
+                // 消失并生成水
+                gsap.to([h.el, oh.el], {
+                    scale: 0,
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        h.el.remove();
+                        oh.el.remove();
+                    }
+                });
+                
+                const water = createMolecule('water', 150, 250);
+                gsap.from(water, { scale: 0, duration: 0.5, delay: 0.2 });
+                
+                await new Promise(r => setTimeout(r, 400));
+            }
+            
+            // 液体变绿色（中性）
+            mainLiquid.classList.remove('acid');
+            mainLiquid.classList.add('neutral');
+            updatePH(7);
+            
+            updateSubtitle(
+                '中和反应完成！溶液变为中性，pH = 7',
+                'Neutralization complete! Solution is now neutral, pH = 7'
+            );
+            
+            // 滴管移走
+            gsap.to(dropper, { top: '-100px', duration: 1 });
+            
+            await new Promise(r => setTimeout(r, 2000));
+        }
+
+        // 主流程
+        async function main() {
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到概念场景
+            await switchScene(scenes.intro, scenes.concept);
+            updateSubtitle(
+                "中和反应的本质：氢离子与氢氧根离子结合生成水",
+                "Essence of neutralization: H⁺ and OH⁻ combine to form water"
+            );
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到主场景
+            await switchScene(scenes.concept, scenes.main);
+            
+            // 开始中和反应动画
+            await neutralizationAnimation();
+            
+            // 完成场景
+            await new Promise(r => setTimeout(r, 1000));
+            await switchScene(scenes.main, scenes.complete);
+            
+            updateSubtitle(
+                "酸碱中和反应演示结束，生成了盐和水",
+                "Acid-base neutralization demonstration complete, salt and water formed"
+            );
+            
+            // 庆祝动画
+            gsap.from('.key-point', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

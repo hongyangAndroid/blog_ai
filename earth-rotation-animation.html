@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地球自转与昼夜时区 - Earth's Rotation, Day/Night & Time Zones</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 标题样式 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 10;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: white;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+
+        .sub-title {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* 概念卡片 */
+        .concept-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 50px 70px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1000px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .concept-title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .concept-text {
+            font-size: 1.3rem;
+            color: #cbd5e1;
+            line-height: 2;
+            margin-bottom: 20px;
+        }
+
+        /* 主可视化区域 */
+        .visualization-area {
+            width: 90%;
+            max-width: 1200px;
+            height: 600px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 太阳系场景 */
+        .solar-system {
+            position: relative;
+            width: 800px;
+            height: 600px;
+        }
+
+        .sun {
+            position: absolute;
+            left: -200px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle at 30% 30%, #fef3c7, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            box-shadow: 0 0 100px #fbbf24, 0 0 200px rgba(251, 191, 36, 0.5);
+        }
+
+        .sun-rays {
+            position: absolute;
+            left: -200px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 600px;
+            height: 400px;
+        }
+
+        .sun-ray {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.8), transparent);
+            transform-origin: left center;
+        }
+
+        /* 地球容器 */
+        .earth-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+        }
+
+        .earth {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                linear-gradient(90deg, #1e40af 0%, #3b82f6 30%, #22c55e 50%, #3b82f6 70%, #1e40af 100%);
+            position: relative;
+            box-shadow: 
+                inset -30px -30px 60px rgba(0,0,0,0.8),
+                0 0 50px rgba(59, 130, 246, 0.5);
+            overflow: hidden;
+        }
+
+        .earth::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 30%;
+            height: 20%;
+            background: rgba(34, 197, 94, 0.6);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+
+        .earth::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 20%;
+            width: 25%;
+            height: 30%;
+            background: rgba(34, 197, 94, 0.5);
+            border-radius: 40%;
+            filter: blur(8px);
+        }
+
+        /* 昼夜分割线 */
+        .day-night-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            z-index: 10;
+        }
+
+        .day-side {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0 150px 150px 0;
+        }
+
+        .night-side {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 150px 0 0 150px;
+        }
+
+        /* 城市标记 */
+        .city-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fbbf24;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fbbf24;
+            z-index: 20;
+        }
+
+        .city-label {
+            position: absolute;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* 时区显示 */
+        .timezone-display {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px 40px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .timezone-item {
+            text-align: center;
+        }
+
+        .timezone-name {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .timezone-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .timezone-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        /* 旋转箭头 */
+        .rotation-arrow {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            color: #22c55e;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        /* 时区地图 */
+        .timezone-map {
+            width: 900px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .world-outline {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 400px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 400px / 200px;
+        }
+
+        .timezone-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timezone-band {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            opacity: 0.3;
+        }
+
+        .timezone-label {
+            position: absolute;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* 字幕区域 */
+        .subtitle-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px 50px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            min-width: 700px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .subtitle-cn {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .subtitle-en {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* 完成场景 */
+        .completion-scene {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .completion-icon {
+            font-size: 7rem;
+            margin-bottom: 30px;
+        }
+
+        .completion-title {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .fact-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .fact-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+
+        .fact-label {
+            font-size: 1rem;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 星空背景 -->
+        <div class="stars" id="stars"></div>
+
+        <!-- 开场介绍 -->
+        <div class="scene active" id="scene-intro">
+            <div class="concept-card">
+                <h1 class="concept-title">🌍 地球自转与昼夜时区</h1>
+                <p class="concept-text">
+                    地球绕着地轴自转，产生了昼夜交替<br>
+                    不同经度的地方见到太阳的时间不同，形成了时区
+                </p>
+                <p class="concept-text" style="font-style: italic; color: #94a3b8;">
+                    Earth's rotation on its axis creates day and night cycles<br>
+                    Different longitudes see the sun at different times, creating time zones
+                </p>
+            </div>
+        </div>
+
+        <!-- 核心概念 -->
+        <div class="scene" id="scene-concept">
+            <div class="concept-card">
+                <h2 class="concept-title">自转与昼夜 Rotation & Day/Night</h2>
+                <div style="display: flex; gap: 60px; justify-content: center; align-items: center; margin: 40px 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">🔄</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #22c55e;">地球自转</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">24小时/圈</div>
+                    </div>
+                    <div style="font-size: 2rem; color: #475569;">→</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">☀️🌙</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #fbbf24;">昼夜交替</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">面向太阳=白天</div>
+                    </div>
+                    <div style="font-size: 2rem; color: #475569;">→</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem; margin-bottom: 15px;">🕐</div>
+                        <div style="font-size: 1.3rem; font-weight: 600; color: #3b82f6;">24时区</div>
+                        <div style="font-size: 1rem; color: #94a3b8; margin-top: 8px;">每15°一个时区</div>
+                    </div>
+                </div>
+                <p class="concept-text">
+                    地球自西向东自转，东边的地区先看到日出，时间比西边早<br>
+                    全球划分为24个时区，每个时区相差1小时
+                </p>
+            </div>
+        </div>
+
+        <!-- 主可视化场景 - 地球昼夜 -->
+        <div class="scene" id="scene-daynight">
+            <div class="title-section">
+                <h1 class="main-title">地球昼夜变化 Day & Night on Earth</h1>
+                <p class="sub-title">观察太阳光照射与昼夜分界线</p>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="solar-system">
+                    <!-- 太阳 -->
+                    <div class="sun"></div>
+                    
+                    <!-- 太阳光线 -->
+                    <div class="sun-rays" id="sun-rays"></div>
+                    
+                    <!-- 地球 -->
+                    <div class="earth-container">
+                        <div class="rotation-arrow">↻</div>
+                        <div class="earth" id="earth">
+                            <div class="night-side"></div>
+                            <div class="day-side"></div>
+                            <div class="day-night-line"></div>
+                            
+                            <!-- 城市标记 -->
+                            <div class="city-marker" style="top: 30%; left: 70%;"></div>
+                            <div class="city-label" style="top: 25%; left: 75%;">北京<br>Beijing</div>
+                            
+                            <div class="city-marker" style="top: 50%; left: 20%;"></div>
+                            <div class="city-label" style="top: 55%; left: 5%;">纽约<br>New York</div>
+                            
+                            <div class="city-marker" style="top: 40%; left: 45%;"></div>
+                            <div class="city-label" style="top: 35%; left: 35%;">伦敦<br>London</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 时区显示 -->
+                    <div class="timezone-display">
+                        <div class="timezone-item">
+                            <div class="timezone-icon">🌅</div>
+                            <div class="timezone-name">北京 Beijing</div>
+                            <div class="timezone-time" id="time-beijing">08:00</div>
+                        </div>
+                        <div class="timezone-item">
+                            <div class="timezone-icon">🌃</div>
+                            <div class="timezone-name">伦敦 London</div>
+                            <div class="timezone-time" id="time-london">00:00</div>
+                        </div>
+                        <div class="timezone-item">
+                            <div class="timezone-icon">🌙</div>
+                            <div class="timezone-name">纽约 New York</div>
+                            <div class="timezone-time" id="time-ny">19:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时区场景 -->
+        <div class="scene" id="scene-timezone">
+            <div class="title-section">
+                <h1 class="main-title">全球时区分布 World Time Zones</h1>
+                <p class="sub-title">24个时区，每15度经度一个时区</p>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="timezone-map" id="timezone-map">
+                    <div class="world-outline"></div>
+                    <!-- 时区带将通过JS生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成场景 -->
+        <div class="scene" id="scene-complete">
+            <div class="completion-scene">
+                <div class="completion-icon">🌍</div>
+                <h1 class="completion-title">地球自转与时区演示完成！</h1>
+                <div class="facts-grid">
+                    <div class="fact-card">
+                        <div class="fact-value">24h</div>
+                        <div class="fact-label">自转周期 Rotation Period</div>
+                    </div>
+                    <div class="fact-card">
+                        <div class="fact-value">24</div>
+                        <div class="fact-label">时区数量 Time Zones</div>
+                    </div>
+                    <div class="fact-card">
+                        <div class="fact-value">15°</div>
+                        <div class="fact-label">每时区经度 Longitude per Zone</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 字幕 -->
+        <div class="subtitle-section">
+            <div class="subtitle-cn" id="subtitle-cn">欢迎来到地球自转与昼夜时区演示</div>
+            <div class="subtitle-en" id="subtitle-en">Welcome to Earth's Rotation and Time Zones Demonstration</div>
+        </div>
+    </div>
+
+    <script>
+        // 生成星空
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 生成太阳光线
+        function createSunRays() {
+            const raysContainer = document.getElementById('sun-rays');
+            for (let i = 0; i < 8; i++) {
+                const ray = document.createElement('div');
+                ray.className = 'sun-ray';
+                const angle = -30 + i * 10;
+                const length = 400 + Math.random() * 100;
+                ray.style.width = length + 'px';
+                ray.style.left = '75px';
+                ray.style.top = '200px';
+                ray.style.transform = `rotate(${angle}deg)`;
+                raysContainer.appendChild(ray);
+            }
+        }
+
+        // 生成时区地图
+        function createTimezoneMap() {
+            const map = document.getElementById('timezone-map');
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#6366f1', '#a855f7'];
+            
+            for (let i = 0; i < 24; i++) {
+                const left = (i / 24) * 100;
+                const width = 100 / 24;
+                
+                // 时区带
+                const band = document.createElement('div');
+                band.className = 'timezone-band';
+                band.style.left = left + '%';
+                band.style.width = width + '%';
+                band.style.background = colors[i % colors.length];
+                map.appendChild(band);
+                
+                // 时区线
+                const line = document.createElement('div');
+                line.className = 'timezone-line';
+                line.style.left = left + '%';
+                map.appendChild(line);
+                
+                // 标签（每3个显示一个）
+                if (i % 3 === 0) {
+                    const label = document.createElement('div');
+                    label.className = 'timezone-label';
+                    label.style.left = (left + 1) + '%';
+                    label.style.top = '10px';
+                    const offset = i - 12;
+                    label.textContent = offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
+                    map.appendChild(label);
+                }
+            }
+        }
+
+        // DOM 元素
+        const scenes = {
+            intro: document.getElementById('scene-intro'),
+            concept: document.getElementById('scene-concept'),
+            daynight: document.getElementById('scene-daynight'),
+            timezone: document.getElementById('scene-timezone'),
+            complete: document.getElementById('scene-complete')
+        };
+        const subtitleCn = document.getElementById('subtitle-cn');
+        const subtitleEn = document.getElementById('subtitle-en');
+        const earth = document.getElementById('earth');
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            gsap.to([subtitleCn, subtitleEn], {
+                opacity: 0,
+                y: 10,
+                duration: 0.3,
+                onComplete: () => {
+                    subtitleCn.textContent = cn;
+                    subtitleEn.textContent = en;
+                    gsap.to([subtitleCn, subtitleEn], {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+
+        // 切换场景
+        function switchScene(from, to) {
+            return new Promise(resolve => {
+                gsap.to(from, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        from.classList.remove('active');
+                        to.classList.add('active');
+                        gsap.fromTo(to, 
+                            { opacity: 0, scale: 0.95 },
+                            { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", onComplete: resolve }
+                        );
+                    }
+                });
+            });
+        }
+
+        // 更新时间显示
+        function updateTimes(beijing, london, ny) {
+            document.getElementById('time-beijing').textContent = beijing;
+            document.getElementById('time-london').textContent = london;
+            document.getElementById('time-ny').textContent = ny;
+        }
+
+        // 地球自转动画
+        async function earthRotationAnimation() {
+            updateSubtitle(
+                '地球自西向东自转，产生昼夜交替',
+                'Earth rotates from west to east, creating day and night cycles'
+            );
+            
+            await new Promise(r => setTimeout(r, 2000));
+            
+            // 地球自转
+            gsap.to(earth, {
+                rotation: 360,
+                duration: 8,
+                ease: "none",
+                repeat: 0
+            });
+            
+            // 更新时间
+            const times = [
+                { bj: '08:00', ln: '00:00', ny: '19:00' },
+                { bj: '14:00', ln: '06:00', ny: '01:00' },
+                { bj: '20:00', ln: '12:00', ny: '07:00' },
+                { bj: '02:00', ln: '18:00', ny: '13:00' }
+            ];
+            
+            for (let i = 0; i < times.length; i++) {
+                await new Promise(r => setTimeout(r, 2000));
+                updateTimes(times[i].bj, times[i].ln, times[i].ny);
+                
+                if (i === 1) {
+                    updateSubtitle(
+                        '北京是白天时，纽约是夜晚',
+                        'When Beijing is daytime, New York is nighttime'
+                    );
+                } else if (i === 2) {
+                    updateSubtitle(
+                        '地球不断自转，昼夜持续交替',
+                        'Earth keeps rotating, day and night keep alternating'
+                    );
+                }
+            }
+            
+            await new Promise(r => setTimeout(r, 1500));
+        }
+
+        // 主流程
+        async function main() {
+            createStars();
+            createSunRays();
+            createTimezoneMap();
+            
+            // 开场等待
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到概念场景
+            await switchScene(scenes.intro, scenes.concept);
+            updateSubtitle(
+                "地球自转产生昼夜，不同经度形成不同时区",
+                "Earth's rotation creates day/night, different longitudes form time zones"
+            );
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 切换到昼夜场景
+            await switchScene(scenes.concept, scenes.daynight);
+            await earthRotationAnimation();
+            
+            // 切换到时区场景
+            await switchScene(scenes.daynight, scenes.timezone);
+            updateSubtitle(
+                "全球划分为24个时区，每个时区跨15度经度",
+                "The world is divided into 24 time zones, each spanning 15 degrees"
+            );
+            
+            // 时区带动画
+            gsap.from('.timezone-band', {
+                scaleX: 0,
+                duration: 0.8,
+                stagger: 0.05,
+                ease: "power2.out"
+            });
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            // 完成场景
+            await switchScene(scenes.timezone, scenes.complete);
+            updateSubtitle(
+                "地球自转与时区演示结束，理解时区有助于国际交流",
+                "Demonstration complete, understanding time zones helps international communication"
+            );
+            
+            // 庆祝动画
+            gsap.from('.fact-card', {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // 启动
+        main();
+    </script>
+</body>
+</html>

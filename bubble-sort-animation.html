@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冒泡排序算法 - Bubble Sort Animation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #container {
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .title p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+
+        #visualization {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 12px;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .bar {
+            width: 70px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .bar.comparing {
+            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 20px rgba(245, 87, 108, 0.5);
+        }
+
+        .bar.swapping {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 20px rgba(79, 172, 254, 0.5);
+        }
+
+        .bar.sorted {
+            background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .bar-value {
+            margin-top: auto;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .bar-index {
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.9rem;
+            color: #95a5a6;
+            font-weight: 500;
+        }
+
+        #subtitle-container {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            min-width: 500px;
+        }
+
+        .subtitle-cn {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle-en {
+            font-size: 1rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(248, 249, 250, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #5a6c7d;
+            min-width: 180px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #5a6c7d;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.comparing { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .legend-color.swapping { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .legend-color.sorted { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="title">
+            <h1>冒泡排序 Bubble Sort</h1>
+            <p>通过相邻元素比较和交换，将最大元素逐步"冒泡"到末尾</p>
+        </div>
+
+        <div id="info-panel">
+            <div class="info-item">
+                <span class="info-label">轮次:</span>
+                <span id="round">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">比较次数:</span>
+                <span id="comparisons">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">交换次数:</span>
+                <span id="swaps">0</span>
+            </div>
+        </div>
+
+        <div id="visualization"></div>
+
+        <div id="subtitle-container">
+            <div class="subtitle-cn">准备开始冒泡排序...</div>
+            <div class="subtitle-en">Preparing to start Bubble Sort...</div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color comparing"></div>
+                <span>比较 Comparing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color swapping"></div>
+                <span>交换 Swapping</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color sorted"></div>
+                <span>已排序 Sorted</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        const data = [64, 34, 25, 12, 22, 11, 90, 5];
+        const container = document.getElementById('visualization');
+        const subtitleCn = document.querySelector('.subtitle-cn');
+        const subtitleEn = document.querySelector('.subtitle-en');
+        const roundEl = document.getElementById('round');
+        const comparisonsEl = document.getElementById('comparisons');
+        const swapsEl = document.getElementById('swaps');
+
+        let comparisons = 0;
+        let swaps = 0;
+
+        // 创建柱状图
+        function createBars() {
+            const maxValue = Math.max(...data);
+            data.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(value / maxValue) * 300 + 80}px`;
+                bar.id = `bar-${index}`;
+                bar.innerHTML = `
+                    <span class="bar-value">${value}</span>
+                    <span class="bar-index">[${index}]</span>
+                `;
+                container.appendChild(bar);
+            });
+        }
+
+        // 更新字幕
+        function updateSubtitle(cn, en) {
+            subtitleCn.textContent = cn;
+            subtitleEn.textContent = en;
+        }
+
+        // 更新统计
+        function updateStats() {
+            comparisonsEl.textContent = comparisons;
+            swapsEl.textContent = swaps;
+        }
+
+        // 获取柱子元素
+        function getBar(index) {
+            return document.getElementById(`bar-${index}`);
+        }
+
+        // 冒泡排序动画
+        async function bubbleSortAnimation() {
+            const bars = data.length;
+            const tl = gsap.timeline();
+
+            updateSubtitle(
+                "冒泡排序开始！我们将重复遍历数组，比较相邻元素",
+                "Bubble Sort begins! We'll repeatedly traverse the array, comparing adjacent elements"
+            );
+
+            await new Promise(r => setTimeout(r, 2000));
+
+            for (let i = 0; i < bars - 1; i++) {
+                roundEl.textContent = i + 1;
+                
+                updateSubtitle(
+                    `第 ${i + 1} 轮：将第 ${bars - i} 大的元素冒泡到正确位置`,
+                    `Round ${i + 1}: Bubbling the ${bars - i}th largest element to its correct position`
+                );
+
+                await new Promise(r => setTimeout(r, 1500));
+
+                for (let j = 0; j < bars - i - 1; j++) {
+                    const bar1 = getBar(j);
+                    const bar2 = getBar(j + 1);
+
+                    // 高亮比较
+                    bar1.classList.add('comparing');
+                    bar2.classList.add('comparing');
+                    comparisons++;
+                    updateStats();
+
+                    updateSubtitle(
+                        `比较 ${data[j]} 和 ${data[j + 1]}`,
+                        `Comparing ${data[j]} and ${data[j + 1]}`
+                    );
+
+                    await new Promise(r => setTimeout(r, 800));
+
+                    if (data[j] > data[j + 1]) {
+                        // 需要交换
+                        updateSubtitle(
+                            `${data[j]} > ${data[j + 1]}，需要交换位置`,
+                            `${data[j]} > ${data[j + 1]}, need to swap`
+                        );
+
+                        bar1.classList.remove('comparing');
+                        bar2.classList.remove('comparing');
+                        bar1.classList.add('swapping');
+                        bar2.classList.add('swapping');
+
+                        await new Promise(r => setTimeout(r, 500));
+
+                        // 执行交换动画
+                        const tempHeight = bar1.style.height;
+                        const tempValue = data[j];
+                        
+                        gsap.to(bar1, {
+                            x: 82,
+                            duration: 0.4,
+                            ease: "power2.inOut"
+                        });
+                        
+                        gsap.to(bar2, {
+                            x: -82,
+                            duration: 0.4,
+                            ease: "power2.inOut",
+                            onComplete: async () => {
+                                // 交换数据
+                                data[j] = data[j + 1];
+                                data[j + 1] = tempValue;
+                                swaps++;
+                                updateStats();
+
+                                // 更新DOM
+                                bar1.style.height = bar2.style.height;
+                                bar1.querySelector('.bar-value').textContent = data[j];
+                                bar2.style.height = tempHeight;
+                                bar2.querySelector('.bar-value').textContent = tempValue;
+
+                                gsap.set([bar1, bar2], { x: 0 });
+                                
+                                bar1.classList.remove('swapping');
+                                bar2.classList.remove('swapping');
+                            }
+                        });
+
+                        await new Promise(r => setTimeout(r, 600));
+                    } else {
+                        updateSubtitle(
+                            `${data[j]} ≤ ${data[j + 1]}，保持位置不变`,
+                            `${data[j]} ≤ ${data[j + 1]}, keep positions`
+                        );
+                        
+                        await new Promise(r => setTimeout(r, 600));
+                        
+                        bar1.classList.remove('comparing');
+                        bar2.classList.remove('comparing');
+                    }
+                }
+
+                // 标记已排序的元素
+                const sortedBar = getBar(bars - i - 1);
+                sortedBar.classList.add('sorted');
+                
+                updateSubtitle(
+                    `第 ${bars - i} 大的元素已就位！`,
+                    `The ${bars - i}th largest element is in place!`
+                );
+                
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            // 标记第一个元素为已排序
+            getBar(0).classList.add('sorted');
+
+            // 完成动画
+            updateSubtitle(
+                "排序完成！数组已按升序排列",
+                "Sorting complete! Array is now sorted in ascending order"
+            );
+
+            // 庆祝动画
+            gsap.to('.bar', {
+                scale: 1.05,
+                duration: 0.3,
+                stagger: 0.1,
+                yoyo: true,
+                repeat: 1,
+                ease: "power2.inOut"
+            });
+
+            // 最终统计
+            await new Promise(r => setTimeout(r, 1000));
+            updateSubtitle(
+                `总共进行了 ${comparisons} 次比较，${swaps} 次交换`,
+                `Total: ${comparisons} comparisons, ${swaps} swaps`
+            );
+        }
+
+        // 启动
+        createBars();
+        setTimeout(bubbleSortAnimation, 1000);
+    </script>
+</body>
+</html>
