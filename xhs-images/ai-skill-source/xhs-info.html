@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skill 去哪找？</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .xhs-card {
+            width: 375px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 封面页 */
+        .cover-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 24px;
+            text-align: center;
+            color: white;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .cover-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .cover-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .cover-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .cover-footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* 内容页 */
+        .content-page {
+            padding: 28px 24px;
+            min-height: 500px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-number {
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* 网站卡片 */
+        .site-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .site-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .site-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+        
+        .site-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .site-url {
+            font-size: 12px;
+            color: #667eea;
+        }
+        
+        .site-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .feature-tag {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* 特点列表 */
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        /* 步骤卡片 */
+        .step-card {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .step-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* 结尾页 */
+        .ending-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 24px;
+            text-align: center;
+            color: white;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ending-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .ending-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .ending-text {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .cta-button {
+            background: white;
+            color: #667eea;
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        /* 分隔线 */
+        .divider {
+            height: 8px;
+            background: #f0f0f0;
+        }
+        
+        /* 提示框 */
+        .tip-box {
+            background: #fff3e0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-top: 16px;
+            border-left: 3px solid #ff9800;
+        }
+        
+        .tip-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #e65100;
+            margin-bottom: 6px;
+        }
+        
+        .tip-text {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* 统计卡片 */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <!-- 封面页 -->
+    <div class="xhs-card">
+        <div class="cover-page">
+            <div class="cover-badge">🔥 热门推荐</div>
+            <div class="cover-icon">🎯</div>
+            <h1 class="cover-title">AI Skill<br>去哪找？</h1>
+            <p class="cover-subtitle">两个网站，Skill海洋任你挑</p>
+            <div class="cover-footer">小红书信息图 · 知识分享</div>
+        </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <!-- 第2页：两个推荐网站 -->
+    <div class="xhs-card">
+        <div class="content-page">
+            <div class="page-header">
+                <div class="page-number">1</div>
+                <div class="page-title">两大Skill宝库</div>
+            </div>
+            
+            <div class="site-card">
+                <div class="site-header">
+                    <div class="site-icon">📊</div>
+                    <div>
+                        <div class="site-name">skills.sh</div>
+                        <div class="site-url">skills.sh</div>
+                    </div>
+                </div>
+                <div class="site-features">
+                    <span class="feature-tag">🔥 24小时趋势</span>
+                    <span class="feature-tag">⭐ 热门排行</span>
+                    <span class="feature-tag">📈 GitHub风格</span>
+                </div>
+            </div>
+            
+            <div class="site-card">
+                <div class="site-header">
+                    <div class="site-icon">🔍</div>
+                    <div>
+                        <div class="site-name">skillsmp.com</div>
+                        <div class="site-url">skillsmp.com</div>
+                    </div>
+                </div>
+                <div class="site-features">
+                    <span class="feature-tag">📚 40万+ Skill</span>
+                    <span class="feature-tag">🔎 支持搜索</span>
+                    <span class="feature-tag">🌟 丰富资源</span>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <div class="tip-title">💡 小贴士</div>
+                <div class="tip-text">skills.sh 类似 GitHub Trending，适合发现热门Skill；skillsmp.com 资源更丰富，支持搜索功能</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <!-- 第3页：使用方法 -->
+    <div class="xhs-card">
+        <div class="content-page">
+            <div class="page-header">
+                <div class="page-number">2</div>
+                <div class="page-title">如何使用Skill？</div>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">找到心仪的Skill</div>
+                    <div class="step-desc">在网站浏览或搜索，找到需要的Skill，点击进入详情页</div>
+                </div>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">下载Skill文件</div>
+                    <div class="step-desc">点击「wget skill.zip」按钮，下载Skill压缩包到本地</div>
+                </div>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">解压并导入</div>
+                    <div class="step-desc">解压压缩包，将Skill文件夹粘贴到Trae工程的skill目录</div>
+                </div>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">开始使用</div>
+                    <div class="step-desc">在Trae中直接调用Skill，享受AI带来的便利！</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <!-- 第4页：实战案例 -->
+    <div class="xhs-card">
+        <div class="content-page">
+            <div class="page-header">
+                <div class="page-number">3</div>
+                <div class="page-title">实战案例：PPT Skill</div>
+            </div>
+            
+            <ul class="feature-list">
+                <li>找到一个85.5k star的热门PPT Skill</li>
+                <li>将微信公众号文章链接发给AI</li>
+                <li>AI自动提取内容并生成精美PPT</li>
+                <li>支持多种主题风格，效果惊艳</li>
+            </ul>
+            
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number">85.5k</div>
+                    <div class="stat-label">⭐ Star数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">40万+</div>
+                    <div class="stat-label">📦 Skill数量</div>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <div class="tip-title">🚀 吸功大法</div>
+                <div class="tip-text">「拿来吧你」+ Skill海洋 = 无敌组合！善用现有Skill，快速提升AI使用效率</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <!-- 结尾页 -->
+    <div class="xhs-card">
+        <div class="ending-page">
+            <div class="ending-icon">🎉</div>
+            <h2 class="ending-title">开启你的Skill之旅</h2>
+            <p class="ending-text">两个网站，海量Skill<br>从此AI使用效率翻倍！<br><br>快去试试吧～</p>
+            <a href="#" class="cta-button">收藏备用 ⭐</a>
+        </div>
+    </div>
+</body>
+</html>

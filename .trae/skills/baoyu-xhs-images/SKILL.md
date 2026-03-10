@@ -141,9 +141,9 @@ xhs-images/{topic-slug}/
 │   ├── 01-cover-[slug].md
 │   ├── 02-content-[slug].md
 │   └── ...
-├── 01-cover-[slug].png
-├── 02-content-[slug].png
-└── NN-ending-[slug].png
+├── 01-cover-[slug].html            # HTML infographic pages
+├── 02-content-[slug].html
+└── NN-ending-[slug].html
 ```
 
 **Slug Generation**:
@@ -175,7 +175,7 @@ XHS Infographic Progress:
 - [ ] Step 2: Confirmation 1 - Content understanding ⚠️ REQUIRED
 - [ ] Step 3: Generate 3 outline + style variants
 - [ ] Step 4: Confirmation 2 - Outline & style & elements selection ⚠️ REQUIRED
-- [ ] Step 5: Generate images (sequential)
+- [ ] Step 5: Generate HTML infographics (sequential)
 - [ ] Step 6: Completion report
 ```
 
@@ -368,45 +368,88 @@ Display the selected style's default elements from preset, then ask:
 - Custom elements → parse user's preferences into elements fields
 - Update `outline.md` frontmatter with final style and elements
 
-### Step 5: Generate Images
+### Step 5: Generate HTML Infographics
 
 With confirmed outline + style + layout:
 
-**Visual Consistency — Reference Image Chain**:
-To ensure character/style consistency across all images in a series:
-1. **Generate image 1 (cover) FIRST** — without `--ref`
-2. **Use image 1 as `--ref` for ALL remaining images** (2, 3, ..., N)
-   - This anchors the character design, color rendering, and illustration style
-   - Command pattern: `--ref <path-to-image-01.png>` added to every subsequent generation
-
-This is critical for styles that use recurring characters, mascots, or illustration elements. Image 1 becomes the visual anchor for the entire series.
-
-**For each image (cover + content + ending)**:
-1. Save prompt to `prompts/NN-{type}-[slug].md` (in user's preferred language)
+**For each page (cover + content + ending)**:
+1. Save content spec to `prompts/NN-{type}-[slug].md` (in user's preferred language)
    - **Backup rule**: If prompt file exists, rename to `prompts/NN-{type}-[slug]-backup-YYYYMMDD-HHMMSS.md`
-2. Generate image:
-   - **Image 1**: Generate without `--ref` (this establishes the visual anchor)
-   - **Images 2+**: Generate with `--ref <image-01-path>` for consistency
-   - **Backup rule**: If image file exists, rename to `NN-{type}-[slug]-backup-YYYYMMDD-HHMMSS.png`
+2. **Generate HTML file** `NN-{type}-[slug].html`:
+   - Create a complete, self-contained HTML file with embedded CSS
+   - Design for 1080×1440px (3:4 ratio, optimal for Xiaohongshu)
+   - Apply the selected visual style (colors, typography, decorations)
+   - Implement the selected layout structure
+   - **Backup rule**: If HTML file exists, rename to `NN-{type}-[slug]-backup-YYYYMMDD-HHMMSS.html`
 3. Report progress after each generation
 
+**HTML Structure Requirements**:
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>[Page Title]</title>
+  <style>
+    /* Embedded CSS based on selected style */
+    :root {
+      --primary-color: #...;
+      --secondary-color: #...;
+      --bg-color: #...;
+      --text-color: #...;
+    }
+    body {
+      width: 1080px;
+      height: 1440px;
+      margin: 0;
+      overflow: hidden;
+      /* style-specific background */
+    }
+    /* layout-specific styles */
+  </style>
+</head>
+<body>
+  <!-- Content based on outline -->
+</body>
+</html>
+```
+
+**Style Implementation**:
+Each style has predefined CSS variables and decorations:
+- `cute`: Pastel colors, rounded corners, heart/star decorations
+- `fresh`: Clean greens/blues, natural elements, leaf decorations
+- `warm`: Warm oranges/pinks, cozy textures, soft shadows
+- `bold`: High contrast, vibrant colors, geometric shapes
+- `minimal`: Monochrome, generous whitespace, thin lines
+- `retro`: Muted tones, grain textures, vintage patterns
+- `pop`: Bright saturated colors, comic-style elements
+- `notion`: Black/white/grays, hand-drawn lines, simple icons
+- `chalkboard`: Dark background, chalk-like colors, chalk textures
+- `study-notes`: Paper background, pen colors, highlighter effects
+
+**Layout Implementation**:
+- `sparse`: Large centered content, minimal elements
+- `balanced`: Grid-based, 3-4 content blocks
+- `dense`: Compact layout, 5-8 content blocks
+- `list`: Vertical enumeration with numbers/bullets
+- `comparison`: Side-by-side columns
+- `flow`: Horizontal or vertical timeline
+- `mindmap`: Radial layout from center
+- `quadrant`: 2×2 grid sections
+
 **Watermark Application** (if enabled in preferences):
-Add to each image generation prompt:
+Add watermark div to HTML:
+```html
+<div class="watermark" style="position: absolute; [position]: 20px; ...">
+  [watermark text]
+</div>
 ```
-Include a subtle watermark "[content]" positioned at [position].
-The watermark should be legible but not distracting from the main content.
-```
-Reference: `references/config/watermark-guide.md`
 
-**Image Generation Skill Selection**:
-- Check available image generation skills
-- If multiple skills available, ask user preference
-
-**Session Management**:
-If image generation skill supports `--sessionId`:
-1. Generate unique session ID: `xhs-{topic-slug}-{timestamp}`
-2. Use same session ID for all images
-3. Combined with reference image chain, ensures maximum visual consistency
+**Visual Consistency**:
+- Use consistent CSS variables across all pages
+- Maintain same typography scale and spacing
+- Apply style decorations consistently
 
 ### Step 6: Completion Report
 
@@ -418,7 +461,7 @@ Strategy: [A/B/C/Combined]
 Style: [style name]
 Layout: [layout name or "varies"]
 Location: [directory path]
-Images: N total
+Pages: N total
 
 ✓ analysis.md
 ✓ outline-strategy-a.md
@@ -427,21 +470,30 @@ Images: N total
 ✓ outline.md (selected: [strategy])
 
 Files:
-- 01-cover-[slug].png ✓ Cover (sparse)
-- 02-content-[slug].png ✓ Content (balanced)
-- 03-content-[slug].png ✓ Content (dense)
-- 04-ending-[slug].png ✓ Ending (sparse)
+- 01-cover-[slug].html ✓ Cover (sparse)
+- 02-content-[slug].html ✓ Content (balanced)
+- 03-content-[slug].html ✓ Content (dense)
+- 04-ending-[slug].html ✓ Ending (sparse)
+
+To view: Open HTML files in browser
+To export as images: Use browser screenshot or html2canvas
 ```
 
-## Image Modification
+## HTML Page Modification
 
 | Action | Steps |
 |--------|-------|
-| **Edit** | **Update prompt file FIRST** → Regenerate with same session ID |
-| **Add** | Specify position → Create prompt → Generate → Renumber subsequent files (NN+1) → Update outline |
+| **Edit** | **Update prompt file FIRST** → Regenerate HTML |
+| **Add** | Specify position → Create prompt → Generate HTML → Renumber subsequent files (NN+1) → Update outline |
 | **Delete** | Remove files → Renumber subsequent (NN-1) → Update outline |
 
-**IMPORTANT**: When updating images, ALWAYS update the prompt file (`prompts/NN-{type}-[slug].md`) FIRST before regenerating. This ensures changes are documented and reproducible.
+**IMPORTANT**: When updating pages, ALWAYS update the prompt file (`prompts/NN-{type}-[slug].md`) FIRST before regenerating. This ensures changes are documented and reproducible.
+
+**Converting HTML to Image**:
+If you need PNG/JPG output for uploading to Xiaohongshu:
+1. **Browser Screenshot**: Open HTML in browser, zoom to 100%, screenshot at 1080×1440
+2. **html2canvas**: Use the JavaScript library to programmatically convert
+3. **Playwright/Puppeteer**: Automated screenshot with headless browser
 
 ## Content Breakdown Principles
 
